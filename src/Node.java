@@ -44,7 +44,10 @@ public class Node {
 			ans[i]=this.labels[i];
 		return ans;
 	}
-	
+	public void setLables(int [] l) {
+		for(int i=0;i<l.length;i++)
+			this.labels[i]=l[i];
+	}
 	public boolean isLeaf() {
 		if( this.leftSon == null && this.rightSon==null)
 			return true;

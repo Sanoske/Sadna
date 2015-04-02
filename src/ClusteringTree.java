@@ -30,13 +30,31 @@ public class ClusteringTree {
 	public void RPCT (double [][] X , double [][] Y ,int mtry, int n0, int sigma0 ) {
 		Node np = new Node(-1, -1, null);
 		if (nrow(X) < n0 || var(Y) < sigma0) {
+			int [] labels = majority(Y);
+			np.setLables(labels);
 			return np;
 		}
 		double [][] I = concerate(X,Y);
 		int [] fs = pickRandomFeatures(X[0].length,mtry);
+		BP best = betsPartition(X,Y,fs);
 		
 	}
 	
+	private int[] majority(double[][] y) {
+		int one=0,zero=0;
+		int [] ans = new int [y[0].length];
+		for(int i=0;i<y[0].length;i++) {
+			for(int j=0;j<y.length;j++) {
+				if( y[j][i] == 1)
+					one++;
+				else
+					zero++;
+			}
+			ans[i] = (one>zero) ? one : zero;
+		}
+		return ans;
+	}
+
 	private int[] pickRandomFeatures(int length, int mtry) {
 		Random rnd = new Random();
 		int [] ans = new int [mtry];
