@@ -27,19 +27,6 @@ public class ClusteringTree {
 		return n.getLabels();
 	}
 	
-	public void RPCT (double [][] X , double [][] Y ,int mtry, int n0, int sigma0 ) {
-		Node np = new Node(-1, -1, null);
-		if (nrow(X) < n0 || var(Y) < sigma0) {
-			int [] labels = majority(Y);
-			np.setLables(labels);
-			return np;
-		}
-		double [][] I = concerate(X,Y);
-		int [] fs = pickRandomFeatures(X[0].length,mtry);
-		BP best = bestPartition(X,Y,fs);
-		
-	}
-	
 	private int[] majority(double[][] y) {
 		int one=0,zero=0;
 		int [] ans = new int [y[0].length];
@@ -111,7 +98,20 @@ public class ClusteringTree {
 		return x.length;
 	}
 	
-	public Forest BootstrapRF (double [][] x, double [][] y, int lambda , int mtry, int sigma0,int n0) {
-		
+	public Node RPCT (double [][] X , double [][] Y ,int mtry, int sigma0, int n0 ) {
+		Node np = new Node(-1, -1, null);
+		if (nrow(X) < n0 || var(Y) < sigma0) {
+			int [] labels = majority(Y);
+			np.setLables(labels);
+			return np;
+		}
+		double [][] I = concerate(X,Y);
+		int [] fs = pickRandomFeatures(X[0].length,mtry);
+		BP best = bestPartition(X,Y,fs);
+		Node nc = RPCT(best.getX1(),best.getY1(),mtry,sigma0,n0);
+		Node nd = RPCT(best.getX2(),best.getY2(),mtry,sigma0,n0);
+		np.setLeftSon(nc);
+		np.setRightSon(nd);
+		return np;
 	}
 }

@@ -3,7 +3,8 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class AlgorithmUtils { 
+public class AlgorithmUtils {
+	
 	public static double[][] readCSV(File file) throws Exception 
 	{
 		Scanner scan = new Scanner(file);
