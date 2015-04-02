@@ -7,7 +7,9 @@ public class Node {
 	private int featureNumber;
 	
 	public Node(int featureNumber,int threshold,int [] labels) {
-		this.labels = labels;
+		this.labels = new int [labels.length];
+		for (int i=0;i<this.labels.length;i++)
+			this.labels[i] = labels[i];
 		this.threshold = threshold;
 		this.featureNumber = featureNumber;
 		this.leftSon = null;

@@ -36,7 +36,7 @@ public class ClusteringTree {
 		}
 		double [][] I = concerate(X,Y);
 		int [] fs = pickRandomFeatures(X[0].length,mtry);
-		BP best = betsPartition(X,Y,fs);
+		BP best = bestPartition(X,Y,fs);
 		
 	}
 	
@@ -51,6 +51,8 @@ public class ClusteringTree {
 					zero++;
 			}
 			ans[i] = (one>zero) ? one : zero;
+			zero = 0;
+			one = 0;
 		}
 		return ans;
 	}
@@ -107,5 +109,9 @@ public class ClusteringTree {
 
 	private int nrow(double[][] x) {
 		return x.length;
+	}
+	
+	public Forest BootstrapRF (double [][] x, double [][] y, int lambda , int mtry, int sigma0,int n0) {
+		
 	}
 }
