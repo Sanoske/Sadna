@@ -25,15 +25,15 @@ public class AlgorithmUtils {
 		return ans;
 	}
 
-	private static int[] pickRandomFeatures(int length, int mtry) {
+	private static int[] pickRandomNumbers(int range, int numOfNumbers) {
 		Random rnd = new Random();
-		int [] ans = new int [mtry];
-		List<Integer> S = new ArrayList<Integer>(length);
-		for (int i = 0; i < length; i++) {
+		int [] ans = new int [numOfNumbers];
+		List<Integer> S = new ArrayList<Integer>(range);
+		for (int i = 0; i < range; i++) {
 	        S.add(i + 1);
 	    }
 		Collections.shuffle(S, rnd);
-		for(int i=0;i<mtry;i++)
+		for(int i=0;i<numOfNumbers;i++)
 			ans[i] = S.get(i);
 		return ans;
 	}
@@ -87,7 +87,7 @@ public class AlgorithmUtils {
 			return np;
 		}
 		double [][] I = concerate(X,Y);
-		int [] fs = pickRandomFeatures(X[0].length,mtry);
+		int [] fs = pickRandomNumbers(X[0].length,mtry);
 		BP best = bestPartition(X,Y,fs);
 		Node nc = RPCTNode(best.getX1(),best.getY1(),mtry,sigma0,n0);
 		Node nd = RPCTNode(best.getX2(),best.getY2(),mtry,sigma0,n0);
@@ -102,6 +102,45 @@ public class AlgorithmUtils {
 		ClusteringTree tree = new ClusteringTree(root);
 		return tree;
 	}
+	
+	/* creating RandomForest. the Funcction returns how many times each feature is used in the forest (array of int).
+	 * the last input is an empty forest that the function fills with trees. */
+	public static int [] BootstrapRF (double [][] X, double [][] Y, int ntree,int lambda,int mtry,int sigma0,int n0, Forest forest) {
+		int n = nrow(X) * lambda;
+		for(int i=0;i<ntree;i++) {
+			int [] s = pickRandomNumbers(X.length, n);
+			double [][] X_temp = new double [s.length][X[0].length];
+			double [][] Y_temp = new double [s.length][Y[0].length];
+			for(int j=0;j<s.length;j++) {
+				X_temp[j] = X[j].clone();
+				Y_temp[j] = Y[j].clone();
+			}
+			ClusteringTree T = RPCT(X_temp,Y_temp,mtry,sigma0,n0);
+			forest.addTree(T);
+		}
+		int [] fcounts = new int [X[0].length];
+		for(int i=0;i<fcounts.length;i++)
+			fcounts[i]=0;
+		countFeaturesInForest(fcounts,forest);
+		return fcounts;
+	}
+	/* count the number of times each feature is used in the forest (array of int). */
+	private static void countFeaturesInForest(int[] fcounts, Forest forest) {
+		int size =forest.getNumberOfTrees();
+		for(int i=0;i<size;i++) {
+			ClusteringTree t = forest.getTree(i);
+			countFeaturesInTree(fcounts,t.getRoot());
+		}
+	}
+	/* count the number of times each feature is used in a tree (array of int). */
+	private static void countFeaturesInTree(int[] fcounts, Node root) {
+		if(root == null)
+			return;
+		fcounts[root.getFeatrueNumber()]++;
+		countFeaturesInTree(fcounts, root.getLeftSon());
+		countFeaturesInTree(fcounts, root.getRightSon());
+	}
+
 	public static double[][] readCSV(File file) throws Exception 
 	{
 		Scanner scan = new Scanner(file);
