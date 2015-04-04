@@ -6,10 +6,10 @@ public class BP {
 	private double [][] x2;
 	private double [][] y1;
 	private double [][] y2;
-	private double f;
+	private int f;
 	private double gain;
 	
-	public BP(double [][] x1,double [][] x2,double [][] y1,double [][] y2,double f,double gain) {
+	public BP(double [][] x1,double [][] x2,double [][] y1,double [][] y2,int f,double gain) {
 	this.x1 = creatMat(x1);
 	this.x2 = creatMat(x2);
 	this.y1 = creatMat(y1);
@@ -25,10 +25,10 @@ public class BP {
 		return this.x2;
 	}
 	public void setX1(double [][] x1) {
-		creatMat(x1);
+		this.x1=creatMat(x1);
 	}
 	public void setX2(double [][] x2) {
-		creatMat(x2);
+		this.x2=creatMat(x2);
 	}
 	public double [][] getY1() {
 		return this.y1;
@@ -37,22 +37,22 @@ public class BP {
 		return this.y2;
 	}
 	public void setY1(double [][] y1) {
-		creatMat(y1);
+		this.y1=creatMat(y1);
 	}
 	public void setY2(double [][] y2) {
-		creatMat(y2);
+		this.y2=creatMat(y2);
 	}
-	public double getF() {
+	public int getF() {
 		return this.f;
 	}
-	public void setF(double f) {
+	public void setF(int f) {
 		this.f = f;
 	}
 	public double getGain() {
 		return this.gain;
 	}
-	public void setGain(double f) {
-		this.f = f;
+	public void setGain(double gain) {
+		this.gain = gain;
 	}
 	private double [][] creatMat(double [][] orig) {
 		double [][] rtrn = new  double[orig.length][];

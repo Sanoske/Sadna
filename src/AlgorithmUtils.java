@@ -97,13 +97,18 @@ public class AlgorithmUtils {
 		return np;
 	}
 	
+	private static BP bestPartition(double[][] x, double[][] y, int[] fs) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	public static ClusteringTree RPCT (double [][] X , double [][] Y ,int mtry, int sigma0, int n0 ) {
 		Node root = RPCTNode(X, Y, mtry, sigma0, n0);
 		ClusteringTree tree = new ClusteringTree(root);
 		return tree;
 	}
 	
-	/* creating RandomForest. the Funcction returns how many times each feature is used in the forest (array of int).
+	/* creating RandomForest. the Function returns how many times each feature is used in the forest (array of int).
 	 * the last input is an empty forest that the function fills with trees. */
 	public static int [] BootstrapRF (double [][] X, double [][] Y, int ntree,int lambda,int mtry,int sigma0,int n0, Forest forest) {
 		int n = nrow(X) * lambda;
