@@ -98,8 +98,45 @@ public class AlgorithmUtils {
 	}
 	
 	private static BP bestPartition(double[][] x, int [][] y, int[] fs) {
-		// TODO Auto-generated method stub
+		double threshold;
+		double h;
+		Object[] ps;
+		BP best = new BP();
+		for (int f : fs) {
+			threshold = thresholdAVG(f,x);
+			ps = binaryPartitions(f,x,threshold);
+			h = 1 ;//calc h somehow...
+			if (h>best.getGain()) {
+				best = new BP(x,y,)
+			}
+		}
 		return null;
+	}
+	
+	private static Object[] binaryPartitions(int f, double[][] x, double threshold) {
+		List<Integer> leftTlist = new ArrayList<Integer>();
+		List<Integer> rightTlist = new ArrayList<Integer>();
+		for(int i=0;i<x.length;i++) {
+			if (x[i][f]<threshold) {
+				leftTlist.add(i);
+			}
+			else {
+				rightTlist.add(i);
+			}
+		}
+		int[] leftTarr = new int[leftTlist.size()];
+		leftTarr = leftTlist.toArray();
+		int[] rightTarr = new int[rightTlist.size()];
+		rightTarr = rightTlist.toArray(rightTarr);
+		return new Object[]{leftTarr, rightTarr};
+	}
+
+	private static double thresholdAVG(int f, double[][] x) {
+		double sum = 0.00;
+		for (int i=0;i<x.length;i++) {
+			sum+=x[i][f];
+		}
+		return (sum/x.length);
 	}
 
 	public static ClusteringTree RPCT (double [][] X , int [][] Y ,int mtry, int sigma0, int n0 ) {
