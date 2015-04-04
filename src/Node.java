@@ -1,15 +1,18 @@
+import java.util.Arrays;
+
 
 public class Node {
 	private Node leftSon;
 	private Node rightSon;
-	private int [] labels;
+	private int [][] labels;
 	private int threshold;
 	private int featureNumber;
 	
-	public Node(int featureNumber,int threshold,int [] labels) {
-		this.labels = new int [labels.length];
-		for (int i=0;i<this.labels.length;i++)
-			this.labels[i] = labels[i];
+	public Node(int featureNumber,int threshold,int [][] labels) {
+		if(labels == null)
+			this.labels = null;
+		else
+			this.labels = creatMat(labels);
 		this.threshold = threshold;
 		this.featureNumber = featureNumber;
 		this.leftSon = null;
@@ -40,19 +43,23 @@ public class Node {
 	public void setFeatureNumber(int f) {
 		this.featureNumber = f;
 	}
-	public int [] getLabels() {
-		int [] ans = new int [this.labels.length];
-		for(int i=0;i<this.labels.length;i++)
-			ans[i]=this.labels[i];
-		return ans;
+	public int [][] getLabels() {
+		return creatMat(labels);
 	}
-	public void setLables(int [] l) {
-		for(int i=0;i<l.length;i++)
-			this.labels[i]=l[i];
+	public void setLables(int [][] l) {
+		this.labels = creatMat(l);
 	}
 	public boolean isLeaf() {
 		if( this.leftSon == null && this.rightSon==null)
 			return true;
 		return false;
+	}
+	
+	private int [][] creatMat(int [][] orig) {
+		int [][] rtrn = new  int[orig.length][];
+		for(int i=0;i<orig.length;i++) {
+			rtrn[i] = Arrays.copyOf(orig[i], orig[i].length);
+		}
+		return rtrn;
 	}
 }
