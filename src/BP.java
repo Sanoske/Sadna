@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 
 public class BP {
 	private double [][] x1;
@@ -8,10 +10,10 @@ public class BP {
 	private double gain;
 	
 	public BP(double [][] x1,double [][] x2,double [][] y1,double [][] y2,double f,double gain) {
-	this.x1 = x1;
-	this.x2 = x2;
-	this.y1 = y1;
-	this.y2 = y2;
+	this.x1 = creatMat(x1);
+	this.x2 = creatMat(x2);
+	this.y1 = creatMat(y1);
+	this.y2 = creatMat(y2);
 	this.f = f;
 	this.gain=gain;
 	}
@@ -23,48 +25,40 @@ public class BP {
 		return this.x2;
 	}
 	public void setX1(double [][] x1) {
-		setMat(x1);
+		creatMat(x1);
 	}
 	public void setX2(double [][] x2) {
-		setMat(x2);
+		creatMat(x2);
 	}
 	public double [][] getY1() {
 		return this.y1;
 	}
-	public Node getX2() {
-		return this.rightSon;
+	public double [][] getY2() {
+		return this.y2;
 	}
-	public void setX1(Node son) {
-		this.leftSon = son;
+	public void setY1(double [][] y1) {
+		creatMat(y1);
 	}
-	public void setX2(Node son) {
-		this.rightSon = son;
+	public void setY2(double [][] y2) {
+		creatMat(y2);
 	}
-	public int getF() {
-		return this.threshold;
+	public double getF() {
+		return this.f;
 	}
-	public void setF(int t) {
-		this.threshold = t;
+	public void setF(double f) {
+		this.f = f;
 	}
-	public int getGain() {
-		return this.featureNumber;
+	public double getGain() {
+		return this.gain;
 	}
-	public void setGain(int f) {
-		this.featureNumber = f;
+	public void setGain(double f) {
+		this.f = f;
 	}
-	public int [] getLabels() {
-		int [] ans = new int [this.labels.length];
-		for(int i=0;i<this.labels.length;i++)
-			ans[i]=this.labels[i];
-		return ans;
-	}
-	public void setLables(int [] l) {
-		for(int i=0;i<l.length;i++)
-			this.labels[i]=l[i];
-	}
-	public boolean isLeaf() {
-		if( this.leftSon == null && this.rightSon==null)
-			return true;
-		return false;
+	private double [][] creatMat(double [][] orig) {
+		double [][] rtrn = new  double[orig.length][];
+		for(int i=0;i<orig.length;i++) {
+			rtrn[i] = Arrays.copyOf(orig[i], orig[i].length);
+		}
+		return rtrn;
 	}
 }
