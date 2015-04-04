@@ -169,13 +169,13 @@ public class AlgorithmUtils {
 		File file = new File("emotions.csv");
 		double [][] features_and_labels =readCSV(file);
 		double [][] features = new double [features_and_labels.length][features_and_labels[0].length-6];
-		double [][] labels = new double [features_and_labels.length][6]; 
+		int [][] labels = new int [features_and_labels.length][6]; 
 		for(int i=0;i<features_and_labels.length;i++)
 			for(int j=0;j<features_and_labels[i].length - 6;j++)
 				features[i][j] = features_and_labels[i][j];
 		
 		for(int i=0;i<features_and_labels.length;i++)
 			for(int j=0;j<6;j++)
-				labels[i][j] = features_and_labels[i][j + features_and_labels[i].length - 6];
+				labels[i][j] = (int)features_and_labels[i][j + features_and_labels[i].length - 6];
 	}
 }
