@@ -4,12 +4,12 @@ import java.util.Arrays;
 public class BP {
 	private double [][] x1;
 	private double [][] x2;
-	private double [][] y1;
-	private double [][] y2;
+	private int [][] y1;
+	private int [][] y2;
 	private int f;
 	private double gain;
 	
-	public BP(double [][] x1,double [][] x2,double [][] y1,double [][] y2,int f,double gain) {
+	public BP(double [][] x1,double [][] x2,int [][] y1,int [][] y2,int f,double gain) {
 	this.x1 = creatMat(x1);
 	this.x2 = creatMat(x2);
 	this.y1 = creatMat(y1);
@@ -30,16 +30,16 @@ public class BP {
 	public void setX2(double [][] x2) {
 		this.x2=creatMat(x2);
 	}
-	public double [][] getY1() {
+	public int [][] getY1() {
 		return this.y1;
 	}
-	public double [][] getY2() {
+	public int [][] getY2() {
 		return this.y2;
 	}
-	public void setY1(double [][] y1) {
+	public void setY1(int [][] y1) {
 		this.y1=creatMat(y1);
 	}
-	public void setY2(double [][] y2) {
+	public void setY2(int [][] y2) {
 		this.y2=creatMat(y2);
 	}
 	public int getF() {
@@ -54,6 +54,15 @@ public class BP {
 	public void setGain(double gain) {
 		this.gain = gain;
 	}
+	
+	private int [][] creatMat(int [][] orig) {
+		int [][] rtrn = new  int[orig.length][];
+		for(int i=0;i<orig.length;i++) {
+			rtrn[i] = Arrays.copyOf(orig[i], orig[i].length);
+		}
+		return rtrn;
+	}
+	
 	private double [][] creatMat(double [][] orig) {
 		double [][] rtrn = new  double[orig.length][];
 		for(int i=0;i<orig.length;i++) {

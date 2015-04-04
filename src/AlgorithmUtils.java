@@ -8,7 +8,7 @@ import java.util.Scanner;
 
 public class AlgorithmUtils {
 	
-	private static int[] majority(double[][] y) {
+	private static int[] majority(int[][] y) {
 		int one=0,zero=0;
 		int [] ans = new int [y[0].length];
 		for(int i=0;i<y[0].length;i++) {
@@ -38,7 +38,7 @@ public class AlgorithmUtils {
 		return ans;
 	}
 
-	private static double[][] concerate(double[][] x, double[][] y) {
+	private static double[][] concerate(double[][] x, int[][] y) {
 		double [][] ans = new double [x.length][x[0].length+y[0].length];
 		for(int i=0;i<x.length;i++)
 			for(int j=0;j<x[0].length;j++)
@@ -49,14 +49,14 @@ public class AlgorithmUtils {
 		return ans;
 	}
 
-	private static double distanceSquare(double [] x1, double [] x2) {
+	private static double distanceSquare(int [] x1, int [] x2) {
 		double result = 0;
 		for(int i=0;i<x1.length;i++)
 			result+=(x1[i]-x2[i])*(x1[i]-x2[i]);
 		return result;
 	}
-	private static double [] YGag(double [][] y) {
-		double [] ans = new double [y[0].length];
+	private static int [] YGag(int [][] y) {
+		int [] ans = new int [y[0].length];
 		for(int j=0;j<ans.length;j++) {
 			ans[j] = 0;
 			for(int i=0;i<y.length;i++) {
@@ -66,9 +66,9 @@ public class AlgorithmUtils {
 		}
 		return ans;
 	}
-	private static double var(double[][] y) {
+	private static double var(int[][] y) {
 		double ans = 0;
-		double [] yGag = YGag(y);
+		int [] yGag = YGag(y);
 		for(int i=0;i<y.length;i++)
 			ans+=distanceSquare(y[i], yGag);
 		ans = ans / y.length;
@@ -79,14 +79,14 @@ public class AlgorithmUtils {
 		return x.length;
 	}
 	
-	private static Node RPCTNode (double [][] X , double [][] Y ,int mtry, int sigma0, int n0 ) {
+	private static Node RPCTNode (double [][] X , int [][] Y ,int mtry, int sigma0, int n0 ) {
 		Node np = new Node(-1, -1, null);
 		if (nrow(X) < n0 || var(Y) < sigma0) {
 			int [] labels = majority(Y);
 			np.setLables(labels);
 			return np;
 		}
-		double [][] I = concerate(X,Y);
+		//double [][] I = concerate(X,Y);
 		int [] fs = pickRandomNumbers(X[0].length,mtry);
 		BP best = bestPartition(X,Y,fs);
 		Node nc = RPCTNode(best.getX1(),best.getY1(),mtry,sigma0,n0);
@@ -97,12 +97,12 @@ public class AlgorithmUtils {
 		return np;
 	}
 	
-	private static BP bestPartition(double[][] x, double[][] y, int[] fs) {
+	private static BP bestPartition(double[][] x, int [][] y, int[] fs) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public static ClusteringTree RPCT (double [][] X , double [][] Y ,int mtry, int sigma0, int n0 ) {
+	public static ClusteringTree RPCT (double [][] X , int [][] Y ,int mtry, int sigma0, int n0 ) {
 		Node root = RPCTNode(X, Y, mtry, sigma0, n0);
 		ClusteringTree tree = new ClusteringTree(root);
 		return tree;
@@ -110,12 +110,12 @@ public class AlgorithmUtils {
 	
 	/* creating RandomForest. the Function returns how many times each feature is used in the forest (array of int).
 	 * the last input is an empty forest that the function fills with trees. */
-	public static int [] BootstrapRF (double [][] X, double [][] Y, int ntree,int lambda,int mtry,int sigma0,int n0, Forest forest) {
+	public static int [] BootstrapRF (double [][] X, int [][] Y, int ntree,int lambda,int mtry,int sigma0,int n0, Forest forest) {
 		int n = nrow(X) * lambda;
 		for(int i=0;i<ntree;i++) {
 			int [] s = pickRandomNumbers(X.length, n);
 			double [][] X_temp = new double [s.length][X[0].length];
-			double [][] Y_temp = new double [s.length][Y[0].length];
+			int [][] Y_temp = new int [s.length][Y[0].length];
 			for(int j=0;j<s.length;j++) {
 				X_temp[j] = X[j].clone();
 				Y_temp[j] = Y[j].clone();
