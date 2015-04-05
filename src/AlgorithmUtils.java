@@ -87,7 +87,7 @@ public class AlgorithmUtils {
 		Object[] ps;
 		BP best = new BP();
 		for (int f : fs) {
-			threshold = thresholdAVG(f,x);
+			threshold = thresholdAVG(f,x); //calc the average threshold
 			ps = binaryPartitions(f,x,threshold);
 			h = 1 ;//calc h somehow...
 			if (h>best.getGain()) {
@@ -97,6 +97,7 @@ public class AlgorithmUtils {
 		return null;
 	}
 	
+	//Binary split X into 2 matrix. mapped into a list of indexes
 	private static Object[] binaryPartitions(int f, double[][] x, double threshold) {
 		List<Integer> leftTlist = new ArrayList<Integer>();
 		List<Integer> rightTlist = new ArrayList<Integer>();
@@ -111,7 +112,7 @@ public class AlgorithmUtils {
 		int[] leftTarr = new int[leftTlist.size()];
 		leftTarr = leftTlist.toArray();
 		int[] rightTarr = new int[rightTlist.size()];
-		rightTarr = rightTlist.toArray(rightTarr);
+		rightTarr = rightTlist.toArray();
 		return new Object[]{leftTarr, rightTarr};
 	}
 
