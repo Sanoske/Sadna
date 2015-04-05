@@ -26,16 +26,24 @@ public class Forest {
 	public int getNumberOfTrees() {
 		return this.numberOfTrees;
 	}
-	
-	public int [] RFPredict (double [] X, int numOfLabels) {
-		int [] p = new int [numOfLabels];
+	/* calculates the means of the i'th column in matrix y*/
+	private static double means(int[][] y, int column) {
+		double means = 0;
+		for(int i=0;i<y.length;i++)
+			means+=y[i][column];
+		means = means / y.length;
+		return means;
+	}
+
+	public double [] RFPredict (double [] X, int numOfLabels) {
+		double [] p = new double [numOfLabels];
 		for(int j=0;j<numOfLabels;j++)
 			p[j] = 0;
 		for(int i=0;i<this.numberOfTrees;i++) {
 			ClusteringTree t = this.list.get(i);
-			int[] Y = t.predictLabels(X);
+			int[][] Y = t.predictLabels(X);
 			for(int j=0;j<numOfLabels;j++)
-				p[i]+=Y[i];
+				p[j]+=means(Y,j);
 		}
 		for(int j=0;j<numOfLabels;j++)
 			p[j] = p[j] / this.numberOfTrees;

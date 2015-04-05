@@ -8,27 +8,10 @@ import org.apache.commons.math3.analysis.*;
 
 public class AlgorithmUtils {
 	
-	private static int[] majority(int[][] y) {
-		int one=0,zero=0;
-		int [] ans = new int [y[0].length];
-		for(int i=0;i<y[0].length;i++) {
-			for(int j=0;j<y.length;j++) {
-				if( y[j][i] == 1)
-					one++;
-				else
-					zero++;
-			}
-			ans[i] = (one>zero) ? one : zero;
-			zero = 0;
-			one = 0;
-		}
-		return ans;
-	}
-
 	private static int[] pickRandomNumbers(int range, int numOfNumbers) {
 		Random rnd = new Random();
 		int [] ans = new int [numOfNumbers];
-		List<Integer> S = new ArrayList<Integer>(range);
+		List<Integer> S = new ArrayList<Integer>();
 		for (int i = 0; i < range; i++) {
 	        S.add(i + 1);
 	    }
@@ -82,7 +65,7 @@ public class AlgorithmUtils {
 	private static Node RPCTNode (double [][] X , int [][] Y ,int mtry, int sigma0, int n0 ) {
 		Node np = new Node(-1, -1, null);
 		if (nrow(X) < n0 || var(Y) < sigma0) {
-			int [] labels = majority(Y);
+			int [][] labels = Y.clone();
 			np.setLables(labels);
 			return np;
 		}
@@ -94,6 +77,7 @@ public class AlgorithmUtils {
 		np.setLeftSon(nc);
 		np.setRightSon(nd);
 		np.setFeatureNumber(best.getF());
+		np.setTrheshold(best.getThreshold());
 		return np;
 	}
 	

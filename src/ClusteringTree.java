@@ -14,7 +14,7 @@ public class ClusteringTree {
 		this.root = n;
 	}
 	
-	public int [] predictLabels(double [] sample) {
+	public int [][] predictLabels(double [] sample) {
 		Node n = this.root;
 		while(!n.isLeaf()) {
 			int threshold = n.getThreshold();
