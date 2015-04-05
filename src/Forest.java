@@ -45,7 +45,6 @@ public class Forest {
 			for(int j=0;j<numOfLabels;j++)
 				p[j]+=means(Y,j);
 		}
-		
 		for(int j=0;j<numOfLabels;j++)
 			p[j] = p[j] / this.numberOfTrees;
 		return p;
