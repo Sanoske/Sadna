@@ -169,5 +169,24 @@ public class CV {
 		return FP/(FP+TN);
 	}
 	
-	
+
+	public static double AUCcurve(int [][] Y , double [][] predict, boolean roc) {
+		ArrayList<Double> thrs = matrixToSortedList(predict);
+		double[] plotX,plotY = new double[thrs.size()];
+		for(int i=0;i<thrs.size();i++) {
+			if (roc) {
+				plotX[i] = getRecall(Y,predict,thrs.get(i));
+				plotY[i] = getFPR(Y,predict,thrs.get(i));
+			}
+			else {
+				plotX[i] = getPrecision(Y,predict,thrs.get(i));
+				plotY[i] = getRecall(Y,predict,thrs.get(i));
+			}
+		}
+		
+	}
+	private static ArrayList<Double> matrixToSortedList(double[][] predict) {
+		
+		return null;
+	}
 }
