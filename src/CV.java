@@ -3,7 +3,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-
+/* the cross validation library*/
 public class CV {
 	
 	/* make an equal partition of the data into numOfFolds groups*/
@@ -168,4 +168,6 @@ public class CV {
 		}
 		return FP/(FP+TN);
 	}
+	
+	
 }
