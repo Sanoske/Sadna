@@ -1,3 +1,4 @@
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -152,8 +153,22 @@ public class CV {
 		UnivariateInterpolator interpolator = new SplineInterpolator();
 		UnivariateFunction function = interpolator.interpolate(plotX, plotY); //interpolating the plot to a function using cubic spline
 		SimpsonIntegrator integrator = new SimpsonIntegrator();
-		double auc = integrator.integrate(10, function, Double.MIN_VALUE, Double.MIN_VALUE);
+		
+		double auc = integrator.integrate(10, function, getMinMax(plotX,"min"), getMinMax(plotX,"max"));
 		return auc;
+	}
+	//a method to get a min/max value of an array
+	private static double getMinMax(double[] plotX, String minmax) {
+		double value = plotX[0];
+		for(int i=1;i<plotX.length;i++) {
+			if (minmax.equals("min") && plotX[i]<value) {
+				value = plotX[i];
+			}
+			if (minmax.equals("max") && plotX[i]>value) {
+				value = plotX[i];
+			}
+		}
+		return value;
 	}
 	private static ArrayList<Double> matrixToSortedList(double[][] predict) {
 		
