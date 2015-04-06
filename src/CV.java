@@ -6,6 +6,7 @@ import java.util.Random;
 /* the cross validation library*/
 public class CV {
 	
+	private static final int precision = 0, recall = 1,error = 2, FPR = 3;
 	/* make an equal partition of the data into numOfFolds groups*/
 	public static int [] CVPartition (int numOfFolds, int numOfSamples) {
 		int [] partition = new int [numOfSamples];
@@ -100,22 +101,31 @@ public class CV {
 		}
 		return predict;
 	}
-	/* get the CV precision*/
-	public static double getPrecision(int [][] Y , double [][] predict, double threshold) {
+	/* get the CV precision, recall , error and FPR*/
+	public static double [] SimplePerformanceScores(int [][] Y , double [][] predict, double threshold) {
 		int [][] YGag = new int [predict.length][predict[0].length];
 		for(int i=0;i<predict.length;i++)
 			for(int j=0;j<predict[0].length;j++)
 				YGag[i][j] = (predict[i][j] > threshold ? 1 : 0);
-		int TP=0,FP=0;
+		int TP=0,FP=0, FN = 0, TN=0;
 		for(int i=0;i<predict.length;i++) {
 			for(int j=0;j<predict[0].length;j++) {
 				if(Y[i][j] == 1 && YGag[i][j] == 1)
 					TP++;
 				if(Y[i][j] == 0 && YGag[i][j] == 1)
 					FP++;
+				if(Y[i][j] == 1 && YGag[i][j] == 0)
+					FN++;
+				if(Y[i][j] == 0 && YGag[i][j] == 0)
+					TN++;
 			}
 		}
-		return TP/(TP+FP);
+		double [] ans = new double [4];
+		ans[precision] = TP/(TP+FP);
+		ans[recall] = TP/(TP+FN);
+		ans [error] = (FN+FP);  //NOT CORRECT RESULT
+		ans [FPR] = FP/(FP+TN);
+		return ans;
 	}
 	/* get the CV recall*/
 	public static double getRecall(int [][] Y , double [][] predict, double threshold) {
