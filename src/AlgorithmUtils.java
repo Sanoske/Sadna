@@ -7,13 +7,13 @@ import java.util.Scanner;
 
 
 public class AlgorithmUtils {
-	
+	// pick numOfNumbers random numbers from 0 to range-1 with no repetitions (needed in RPCTNode)
 	private static int[] pickRandomNumbers(int range, int numOfNumbers) {
 		Random rnd = new Random();
 		int [] ans = new int [numOfNumbers];
 		List<Integer> S = new ArrayList<Integer>();
 		for (int i = 0; i < range; i++) {
-	        S.add(i + 1);
+	        S.add(i);
 	    }
 		Collections.shuffle(S, rnd);
 		for(int i=0;i<numOfNumbers;i++)
@@ -21,7 +21,7 @@ public class AlgorithmUtils {
 		return ans;
 	}
 
-	private static double[][] concerate(double[][] x, int[][] y) {
+	/*private static double[][] concerate(double[][] x, int[][] y) {
 		double [][] ans = new double [x.length][x[0].length+y[0].length];
 		for(int i=0;i<x.length;i++)
 			for(int j=0;j<x[0].length;j++)
@@ -30,16 +30,18 @@ public class AlgorithmUtils {
 			for(int j=0;j<y[0].length;j++)
 				ans[i][j+x[0].length] = y[i][j];
 		return ans;
-	}
-
-	private static double distanceSquare(int [] x1, int [] x2) {
+	}*/
+	
+	// compute the  Euclidian distance between 2 vectors
+	private static double distanceSquare(int [] x1, double [] x2) {
 		double result = 0;
 		for(int i=0;i<x1.length;i++)
-			result+=(x1[i]-x2[i])*(x1[i]-x2[i]);
+			result+=Math.pow((x1[i]-x2[i]),2);
 		return result;
 	}
-	private static int [] YGag(int [][] y) {
-		int [] ans = new int [y[0].length];
+	//  compute the mean over the columns of  matrix y
+	private static double [] YGag(int [][] y) {
+		double [] ans = new double [y[0].length];
 		for(int j=0;j<ans.length;j++) {
 			ans[j] = 0;
 			for(int i=0;i<y.length;i++) {
@@ -49,23 +51,26 @@ public class AlgorithmUtils {
 		}
 		return ans;
 	}
+	// compute the variance of matrix y
 	private static double var(int[][] y) {
 		double ans = 0;
-		int [] yGag = YGag(y);
+		double [] yGag = YGag(y);
 		for(int i=0;i<y.length;i++)
 			ans+=distanceSquare(y[i], yGag);
 		ans = ans / y.length;
 		return ans;
 	}
-
+	// number of rows in matrix x
 	private static int nrow(double[][] x) {
 		return x.length;
 	}
-	
+	// build RPCT 
 	private static Node RPCTNode (double [][] X , int [][] Y ,int mtry, int sigma0, int n0 ) {
 		Node np = new Node(-1, -1, null);
 		if (nrow(X) < n0 || var(Y) < sigma0) {
-			int [][] labels = Y.clone();
+			int [][] labels = new int [Y.length][];
+			for( int k=0;k<Y.length;k++)
+				labels[k] = Y[k].clone();
 			np.setLables(labels);
 			return np;
 		}
@@ -73,14 +78,14 @@ public class AlgorithmUtils {
 		int [] fs = pickRandomNumbers(X[0].length,mtry);
 		BP best = bestPartition(X,Y,fs);
 		Node nc = RPCTNode(best.getX1(),best.getY1(),mtry,sigma0,n0);
-		Node nd = RPCTNode(best.getX2(),best.getY2(),mtry,sigma0,n0);
 		np.setLeftSon(nc);
+		Node nd = RPCTNode(best.getX2(),best.getY2(),mtry,sigma0,n0);
 		np.setRightSon(nd);
 		np.setFeatureNumber(best.getF());
 		np.setTrheshold(best.getThreshold());
 		return np;
 	}
-	
+	// given set of features,finds the featrue with the best partition and computes the partition
 	private static BP bestPartition(double[][] x, int [][] y, int[] fs) {
 		double threshold;
 		double h;
@@ -91,7 +96,7 @@ public class AlgorithmUtils {
 			ps = binaryPartitions(f,x,threshold);
 			h = 1 ;//calc h somehow...
 			if (h>best.getGain()) {
-				best = new BP(x,y,)
+				best = new BP(x,y,)	
 			}
 		}
 		return null;
@@ -115,7 +120,7 @@ public class AlgorithmUtils {
 		rightTarr = rightTlist.toArray();
 		return new Object[]{leftTarr, rightTarr};
 	}
-
+	// computes the AVG of the feature and sets it as t'
 	private static double thresholdAVG(int f, double[][] x) {
 		double sum = 0.00;
 		for (int i=0;i<x.length;i++) {
@@ -123,7 +128,7 @@ public class AlgorithmUtils {
 		}
 		return (sum/x.length);
 	}
-
+	// creates the root of the clustering tree and assigns it to a tree
 	public static ClusteringTree RPCT (double [][] X , int [][] Y ,int mtry, int sigma0, int n0 ) {
 		Node root = RPCTNode(X, Y, mtry, sigma0, n0);
 		ClusteringTree tree = new ClusteringTree(root);
@@ -132,15 +137,15 @@ public class AlgorithmUtils {
 	
 	/* creating RandomForest. the Function returns how many times each feature is used in the forest (array of int).
 	 * the last input is an empty forest that the function fills with trees. */
-	public static int [] BootstrapRF (double [][] X, int [][] Y, int ntree,int lambda,int mtry,int sigma0,int n0, Forest forest) {
-		int n = nrow(X) * lambda;
+	public static int [] BootstrapRF (double [][] X, int [][] Y, int ntree,double lambda,int mtry,int sigma0,int n0, Forest forest) {
+		int n = (int) (nrow(X) * lambda);
 		for(int i=0;i<ntree;i++) {
 			int [] s = pickRandomNumbers(X.length, n);
 			double [][] X_temp = new double [s.length][X[0].length];
 			int [][] Y_temp = new int [s.length][Y[0].length];
 			for(int j=0;j<s.length;j++) {
-				X_temp[j] = X[j].clone();
-				Y_temp[j] = Y[j].clone();
+				X_temp[j] = X[s[j]].clone();
+				Y_temp[j] = Y[s[j]].clone();
 			}
 			ClusteringTree T = RPCT(X_temp,Y_temp,mtry,sigma0,n0);
 			forest.addTree(T);
