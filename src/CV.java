@@ -127,59 +127,7 @@ public class CV {
 		ans [FPR] = FP/(FP+TN);
 		return ans;
 	}
-	/* get the CV recall*/
-	public static double getRecall(int [][] Y , double [][] predict, double threshold) {
-		int [][] YGag = new int [predict.length][predict[0].length];
-		for(int i=0;i<predict.length;i++)
-			for(int j=0;j<predict[0].length;j++)
-				YGag[i][j] = (predict[i][j] > threshold ? 1 : 0);
-		int TP=0,FN=0;
-		for(int i=0;i<predict.length;i++) {
-			for(int j=0;j<predict[0].length;j++) {
-				if(Y[i][j] == 1 && YGag[i][j] == 1)
-					TP++;
-				if(Y[i][j] == 1 && YGag[i][j] == 0)
-					FN++;
-			}
-		}
-		return TP/(TP+FN);
-	}
-	/* get the CV error*/
-	public static double getError(int [][] Y , double [][] predict, double threshold) {
-		int [][] YGag = new int [predict.length][predict[0].length];
-		for(int i=0;i<predict.length;i++)
-			for(int j=0;j<predict[0].length;j++)
-				YGag[i][j] = (predict[i][j] > threshold ? 1 : 0);
-		int FN=0,FP=0;
-		for(int i=0;i<predict.length;i++) {
-			for(int j=0;j<predict[0].length;j++) {
-				if(Y[i][j] == 1 && YGag[i][j] == 0)
-					FN++;
-				if(Y[i][j] == 0 && YGag[i][j] == 1)
-					FP++;
-			}
-		}
-		return (FN+FP);  //NOT CORRECT RESULT
-	}
-	/* get the CV FPR*/
-	public static double getFPR(int [][] Y , double [][] predict, double threshold) {
-		int [][] YGag = new int [predict.length][predict[0].length];
-		for(int i=0;i<predict.length;i++)
-			for(int j=0;j<predict[0].length;j++)
-				YGag[i][j] = (predict[i][j] > threshold ? 1 : 0);
-		int TN=0,FP=0;
-		for(int i=0;i<predict.length;i++) {
-			for(int j=0;j<predict[0].length;j++) {
-				if(Y[i][j] == 0 && YGag[i][j] == 0)
-					TN++;
-				if(Y[i][j] == 0 && YGag[i][j] == 1)
-					FP++;
-			}
-		}
-		return FP/(FP+TN);
-	}
 	
-
 	public static double AUCcurve(int [][] Y , double [][] predict, boolean roc) {
 		ArrayList<Double> thrs = matrixToSortedList(predict);
 		double[] plotX,plotY = new double[thrs.size()];
