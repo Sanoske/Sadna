@@ -3,6 +3,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.commons.math3.analysis.UnivariateFunction;
+import org.apache.commons.math3.analysis.integration.SimpsonIntegrator;
+import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
+import org.apache.commons.math3.analysis.interpolation.UnivariateInterpolator;
+
 /* the cross validation library*/
 public class CV {
 	
@@ -128,20 +133,27 @@ public class CV {
 		return ans;
 	}
 	
-	public static double AUCcurve(int [][] Y , double [][] predict, boolean roc) {
+	public static double AUCcurve(int [][] Y, double [][] predict, boolean roc) {
 		ArrayList<Double> thrs = matrixToSortedList(predict);
-		double[] plotX,plotY = new double[thrs.size()];
+		double[] plotX = new double[thrs.size()];
+		double[] plotY = new double[thrs.size()];
+		double[] sps = new double[4];
 		for(int i=0;i<thrs.size();i++) {
+			sps = SimplePerformanceScores(Y,predict,thrs.get(i));
 			if (roc) {
-				plotX[i] = getRecall(Y,predict,thrs.get(i));
-				plotY[i] = getFPR(Y,predict,thrs.get(i));
+				plotX[i] = sps[recall];
+				plotY[i] = sps[FPR];
 			}
 			else {
-				plotX[i] = getPrecision(Y,predict,thrs.get(i));
-				plotY[i] = getRecall(Y,predict,thrs.get(i));
+				plotX[i] = sps[precision];
+				plotY[i] = sps[recall];
 			}
 		}
-		
+		UnivariateInterpolator interpolator = new SplineInterpolator();
+		UnivariateFunction function = interpolator.interpolate(plotX, plotY); //interpolating the plot to a function using cubic spline
+		SimpsonIntegrator integrator = new SimpsonIntegrator();
+		double auc = integrator.integrate(10, function, Double.MIN_VALUE, Double.MIN_VALUE);
+		return auc;
 	}
 	private static ArrayList<Double> matrixToSortedList(double[][] predict) {
 		
