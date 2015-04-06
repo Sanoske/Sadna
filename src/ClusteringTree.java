@@ -17,7 +17,7 @@ public class ClusteringTree {
 	public int [][] predictLabels(double [] sample) {
 		Node n = this.root;
 		while(!n.isLeaf()) {
-			int threshold = n.getThreshold();
+			double threshold = n.getThreshold();
 			int feature = n.getFeatrueNumber();
 			if( sample[feature] < threshold)
 				n = n.getLeftSon();

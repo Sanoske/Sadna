@@ -5,10 +5,10 @@ public class Node {
 	private Node leftSon;
 	private Node rightSon;
 	private int [][] labels;
-	private int threshold;
+	private double threshold;
 	private int featureNumber;
 	
-	public Node(int featureNumber,int threshold,int [][] labels) {
+	public Node(int featureNumber,double threshold,int [][] labels) {
 		if(labels == null)
 			this.labels = null;
 		else
@@ -31,10 +31,10 @@ public class Node {
 	public void setRightSon(Node son) {
 		this.rightSon = son;
 	}
-	public int getThreshold() {
+	public double getThreshold() {
 		return this.threshold;
 	}
-	public void setTrheshold(int t) {
+	public void setTrheshold(double t) {
 		this.threshold = t;
 	}
 	public int getFeatrueNumber() {
