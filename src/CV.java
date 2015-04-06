@@ -170,6 +170,7 @@ public class CV {
 		}
 		return value;
 	}
+	//if we understood correctly, sorting the matrix as 1d array
 	private static ArrayList<Double> matrixToSortedList(double[][] predict) {
 		
 		return null;
