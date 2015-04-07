@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -107,39 +108,37 @@ public class CV {
 		return predict;
 	}
 	/* get the CV precision, recall , error and FPR*/
-	public static double [] SimplePerformanceScores(int [][] Y , double [][] predict, double threshold) {
-		int [][] YGag = new int [predict.length][predict[0].length];
+	public static double [] SimplePerformanceScores(int [] Y , double [] predict, double threshold) {
+		int [] YGag = new int [predict.length];
 		for(int i=0;i<predict.length;i++)
-			for(int j=0;j<predict[0].length;j++)
-				YGag[i][j] = (predict[i][j] > threshold ? 1 : 0);
+			YGag[i] = (predict[i] > threshold ? 1 : 0);
 		int TP=0,FP=0, FN = 0, TN=0;
 		for(int i=0;i<predict.length;i++) {
-			for(int j=0;j<predict[0].length;j++) {
-				if(Y[i][j] == 1 && YGag[i][j] == 1)
-					TP++;
-				if(Y[i][j] == 0 && YGag[i][j] == 1)
-					FP++;
-				if(Y[i][j] == 1 && YGag[i][j] == 0)
-					FN++;
-				if(Y[i][j] == 0 && YGag[i][j] == 0)
-					TN++;
-			}
+			if(Y[i] == 1 && YGag[i] == 1)
+				TP++;
+			if(Y[i] == 0 && YGag[i] == 1)
+				FP++;
+			if(Y[i] == 1 && YGag[i] == 0)
+				FN++;
+			if(Y[i] == 0 && YGag[i] == 0)
+				TN++;
 		}
 		double [] ans = new double [4];
 		ans[precision] = TP/(TP+FP);
 		ans[recall] = TP/(TP+FN);
-		ans [error] = (FN+FP);  //NOT CORRECT RESULT
+		ans [error] = (FN+FP)/Y.length;
 		ans [FPR] = FP/(FP+TN);
 		return ans;
 	}
 	
-	public static double AUCcurve(int [][] Y, double [][] predict, boolean roc) {
-		ArrayList<Double> thrs = matrixToSortedList(predict);
-		double[] plotX = new double[thrs.size()];
-		double[] plotY = new double[thrs.size()];
+	public static double AUCcurve(int [] Y, double [] predict, boolean roc) {
+		double [] thrs = predict.clone();
+		Arrays.sort(thrs);
+		double[] plotX = new double[thrs.length];
+		double[] plotY = new double[thrs.length];
 		double[] sps = new double[4];
-		for(int i=0;i<thrs.size();i++) {
-			sps = SimplePerformanceScores(Y,predict,thrs.get(i));
+		for(int i=0;i<thrs.length;i++) {
+			sps = SimplePerformanceScores(Y,predict,thrs[i]);
 			if (roc) {
 				plotX[i] = sps[recall];
 				plotY[i] = sps[FPR];
@@ -168,10 +167,5 @@ public class CV {
 			}
 		}
 		return value;
-	}
-	//if we understood correctly, sorting the matrix as 1d array
-	private static ArrayList<Double> matrixToSortedList(double[][] predict) {
-		
-		return null;
 	}
 }
