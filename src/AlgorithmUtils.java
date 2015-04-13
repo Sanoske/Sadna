@@ -1,9 +1,11 @@
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.Set;
 
 
 public class AlgorithmUtils {
@@ -140,7 +142,7 @@ public class AlgorithmUtils {
 	public static int [] BootstrapRF (double [][] X, int [][] Y, int ntree,double lambda,int mtry,int sigma0,int n0, Forest forest) {
 		int n = (int) (nrow(X) * lambda);
 		for(int i=0;i<ntree;i++) {
-			int [] s = pickRandomNumbers(X.length, n);
+			int [] s = pickRandomNumbersWithReplacement(X.length, n);
 			double [][] X_temp = new double [s.length][X[0].length];
 			int [][] Y_temp = new int [s.length][Y[0].length];
 			for(int j=0;j<s.length;j++) {
@@ -156,6 +158,19 @@ public class AlgorithmUtils {
 		countFeaturesInForest(fcounts,forest);
 		return fcounts;
 	}
+	/* sample number from 0 to length-1 n times with replacment*/
+	private static int[] pickRandomNumbersWithReplacement(int length, int n) {
+		HashSet<Integer> s = new HashSet<Integer>();
+		Random r = new Random();
+		for(int j=0; j<n; j++)
+			s.add(r.nextInt(length));
+		Integer [] oldArray = (Integer[]) s.toArray();
+		int [] newArray = new int[oldArray.length];
+		for(int i=0; i<oldArray.length; i++)
+			newArray[i] = (int) oldArray[i];
+		return newArray;
+	}
+
 	/* count the number of times each feature is used in the forest (array of int). */
 	private static void countFeaturesInForest(int[] fcounts, Forest forest) {
 		int size =forest.getNumberOfTrees();
