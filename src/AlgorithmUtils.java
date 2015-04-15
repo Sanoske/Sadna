@@ -1,6 +1,8 @@
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -88,24 +90,59 @@ public class AlgorithmUtils {
 		return np;
 	}
 	// given set of features,finds the featrue with the best partition and computes the partition
-	private static BP bestPartition(double[][] x, int [][] y, int[] fs) {
+	private static BP bestPartition(double[][] x_start, int [][] y, int[] fs) {
 		double threshold;
 		double h;
-		Object[] ps;
+		HashMap<Integer, double [][]> ps;
 		BP best = new BP();
-		for (int f : fs) {
-			threshold = thresholdAVG(f,x); //calc the average threshold
-			ps = binaryPartitions(f,x,threshold);
-			h = 1 ;//calc h somehow...
-			if (h>best.getGain()) {
-				best = new BP(x,y,)	
+		int numOfSamples = (x_start.length > 50 ? 50 : x_start.length);
+		for(int i=0; i<3; i++) {
+			int [] samples = pickRandomNumbers(x_start.length, numOfSamples);
+			double [][] x = new double [numOfSamples][x_start[0].length];
+			//now we work with only 50 samples
+			for( int j=0; j<numOfSamples; j++)
+				x[j] = x_start[samples[j]].clone();
+			
+			for (int f : fs) {
+				x = sortWithRespectToFeature(x,f);
+				for( int k=0; k< x.length - 1; k++) {
+					threshold = (x[k][f]+x[k+1][f])/2;
+					ps = binaryPartitions(f,x,threshold);
+					h = 1 ;//calc h somehow...
+					if (h>best.getGain()) {
+						best = new BP(x,y,)	
+					}
+				}
 			}
 		}
 		return null;
 	}
-	
-	//Binary split X into 2 matrix. mapped into a list of indexes
-	private static Object[] binaryPartitions(int f, double[][] x, double threshold) {
+	// sort the matrix x with respect to feature number f
+	private static double [][] sortWithRespectToFeature(double[][] x, int f) {
+		double [][] result = new double [x.length][x[0].length];
+		int min;
+		for( int i=0; i < x.length; i++) {
+			min = getMin(x,f);
+			result[i] = x[min].clone();
+			x[min][f] = Double.MAX_VALUE;
+		}
+		return result;
+	}
+	// returns the index of the minimum value in column number f
+	private static int getMin(double[][] x, int f) {
+		double min = x[0][f];
+		int minIndex = 0;
+		for( int i=1; i < x.length ; i++)
+			if( x[i][f] < min) {
+				min = x[i][f];
+				minIndex = i;
+			}
+		return minIndex;
+	}
+
+	//Binary split X into 2 matrices, and returns them
+	private static HashMap<Integer, double [][]> binaryPartitions(int f, double[][] x, double threshold) {
+		HashMap<Integer, double [][]> partition = new HashMap<Integer, double[][]>();
 		List<Integer> leftTlist = new ArrayList<Integer>();
 		List<Integer> rightTlist = new ArrayList<Integer>();
 		for(int i=0;i<x.length;i++) {
@@ -116,19 +153,21 @@ public class AlgorithmUtils {
 				rightTlist.add(i);
 			}
 		}
-		int[] leftTarr = new int[leftTlist.size()];
-		leftTarr = leftTlist.toArray();
-		int[] rightTarr = new int[rightTlist.size()];
-		rightTarr = rightTlist.toArray();
-		return new Object[]{leftTarr, rightTarr};
-	}
-	// computes the AVG of the feature and sets it as t'
-	private static double thresholdAVG(int f, double[][] x) {
-		double sum = 0.00;
-		for (int i=0;i<x.length;i++) {
-			sum+=x[i][f];
+		double [][] small = new double [leftTlist.size()][x[0].length];
+		int count = 0;
+		for( int j : leftTlist) {
+			small[count] = x[j];
+			count++;
 		}
-		return (sum/x.length);
+		double [][] big = new double [rightTlist.size()][x[0].length];
+		count = 0;
+		for( int j : rightTlist) {
+			big[count] = x[j];
+			count++;
+		}
+		partition.put(0, small);
+		partition.put(1, big);
+		return partition;
 	}
 	// creates the root of the clustering tree and assigns it to a tree
 	public static ClusteringTree RPCT (double [][] X , int [][] Y ,int mtry, int sigma0, int n0 ) {

@@ -23,7 +23,7 @@ public class BP {
 	
 	//overloading builders
 	public BP() {
-		this(null,null,null,null,0,0,0);
+		this(null,null,null,null,0,Double.MIN_VALUE,0);
 	}
 	
 	public double [][] getX1() {
