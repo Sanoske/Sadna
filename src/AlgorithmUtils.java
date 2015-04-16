@@ -25,7 +25,7 @@ public class AlgorithmUtils {
 		return ans;
 	}
 
-	/*private static double[][] concerate(double[][] x, int[][] y) {
+	private static double[][] concatenate(double[][] x, int[][] y) {
 		double [][] ans = new double [x.length][x[0].length+y[0].length];
 		for(int i=0;i<x.length;i++)
 			for(int j=0;j<x[0].length;j++)
@@ -34,7 +34,7 @@ public class AlgorithmUtils {
 			for(int j=0;j<y[0].length;j++)
 				ans[i][j+x[0].length] = y[i][j];
 		return ans;
-	}*/
+	}
 	
 	// compute the  Euclidian distance between 2 vectors
 	private static double distanceSquare(int [] x1, double [] x2) {
@@ -43,8 +43,27 @@ public class AlgorithmUtils {
 			result+=Math.pow((x1[i]-x2[i]),2);
 		return result;
 	}
+	// compute the  Euclidian distance between 2 vectors
+		private static double distanceSquare(double [] x1, double [] x2) {
+			double result = 0;
+			for(int i=0;i<x1.length;i++)
+				result+=Math.pow((x1[i]-x2[i]),2);
+			return result;
+		}
 	//  compute the mean over the columns of  matrix y
 	private static double [] YGag(int [][] y) {
+		double [] ans = new double [y[0].length];
+		for(int j=0;j<ans.length;j++) {
+			ans[j] = 0;
+			for(int i=0;i<y.length;i++) {
+				ans[j]+= y[i][j];
+			}
+			ans[j] = ans[j] / y.length;
+		}
+		return ans;
+	}
+//  compute the mean over the columns of  matrix y
+	private static double [] YGag(double [][] y) {
 		double [] ans = new double [y[0].length];
 		for(int j=0;j<ans.length;j++) {
 			ans[j] = 0;
@@ -64,6 +83,15 @@ public class AlgorithmUtils {
 		ans = ans / y.length;
 		return ans;
 	}
+	// compute the variance of matrix y
+		private static double var(double[][] y) {
+			double ans = 0;
+			double [] yGag = YGag(y);
+			for(int i=0;i<y.length;i++)
+				ans+=distanceSquare(y[i], yGag);
+			ans = ans / y.length;
+			return ans;
+		}
 	// number of rows in matrix x
 	private static int nrow(double[][] x) {
 		return x.length;
@@ -78,7 +106,6 @@ public class AlgorithmUtils {
 			np.setLables(labels);
 			return np;
 		}
-		//double [][] I = concerate(X,Y);
 		int [] fs = pickRandomNumbers(X[0].length,mtry);
 		BP best = bestPartition(X,Y,fs);
 		Node nc = RPCTNode(best.getX1(),best.getY1(),mtry,sigma0,n0);
@@ -90,7 +117,7 @@ public class AlgorithmUtils {
 		return np;
 	}
 	// given set of features,finds the featrue with the best partition and computes the partition
-	private static BP bestPartition(double[][] x_start, int [][] y, int[] fs) {
+	private static BP bestPartition(double[][] x_start, int [][] y_start, int[] fs) {
 		double threshold;
 		double h;
 		HashMap<Integer, double [][]> ps;
@@ -99,33 +126,67 @@ public class AlgorithmUtils {
 		for(int i=0; i<3; i++) {
 			int [] samples = pickRandomNumbers(x_start.length, numOfSamples);
 			double [][] x = new double [numOfSamples][x_start[0].length];
+			int [][] y = new int [numOfSamples][y_start[0].length];
 			//now we work with only 50 samples
-			for( int j=0; j<numOfSamples; j++)
+			for( int j=0; j<numOfSamples; j++) {
 				x[j] = x_start[samples[j]].clone();
+				y[j] = y_start[samples[j]].clone();
+			}
 			
 			for (int f : fs) {
-				x = sortWithRespectToFeature(x,f);
+				x = sortWithRespectToFeature(x,f,y);
 				for( int k=0; k< x.length - 1; k++) {
 					threshold = (x[k][f]+x[k+1][f])/2;
-					ps = binaryPartitions(f,x,threshold);
-					h = 1 ;//calc h somehow...
-					if (h>best.getGain()) {
-						best = new BP(x,y,)	
+					ps = binaryPartitions(f,x,y,threshold);
+					double [][] x_small = extractXMatrix(ps.get(0),x[0].length);
+					int [][] y_small = extractYMatrix(ps.get(0),x[0].length+1, ps.get(0)[0].length);
+					double [][] x_big = extractXMatrix(ps.get(1), x[0].length);
+					int [][] y_big = extractYMatrix(ps.get(1), x[0].length+1, ps.get(1)[0].length);
+					h = y_small.length*var(y_small) + y_big.length*var(y_big);
+					h = h/ x.length;
+					if (h<best.getGain()) {
+						best.setX1(x_small);
+						best.setX2(x_big);
+						best.setY1(y_small);
+						best.setY2(y_big);
+						best.setF(f);
+						best.setGain(h);
+						best.setThreshold(threshold);
 					}
 				}
 			}
 		}
-		return null;
+		return best;
 	}
+	private static int[][] extractYMatrix(double[][] ds, int start, int end) {
+		int [][] ans = new int [ds.length][end-start+1];
+		for(int i=0; i<ds.length; i++)
+			for(int j=start; j<end; j++)
+				ans[i][j] = (int) ds[i][j];
+		return ans;
+	}
+
+	private static double[][] extractXMatrix(double[][] ds, int length) {
+		double [][] ans = new double [ds.length][length];
+		for(int i=0; i<ds.length; i++)
+			for( int j=0; j<length; j++)
+				ans[i][j] = ds[i][j];
+		return ans;
+	}
+
 	// sort the matrix x with respect to feature number f
-	private static double [][] sortWithRespectToFeature(double[][] x, int f) {
+	private static double [][] sortWithRespectToFeature(double[][] x, int f, int [][] y) {
 		double [][] result = new double [x.length][x[0].length];
+		int [][] y_result = new int [y.length][y[0].length];
 		int min;
 		for( int i=0; i < x.length; i++) {
 			min = getMin(x,f);
 			result[i] = x[min].clone();
+			y_result[i] = y[min].clone();
 			x[min][f] = Double.MAX_VALUE;
 		}
+		for(int j=0; j<y.length; j++)
+			y[j] = y_result[j].clone();
 		return result;
 	}
 	// returns the index of the minimum value in column number f
@@ -141,7 +202,7 @@ public class AlgorithmUtils {
 	}
 
 	//Binary split X into 2 matrices, and returns them
-	private static HashMap<Integer, double [][]> binaryPartitions(int f, double[][] x, double threshold) {
+	private static HashMap<Integer, double [][]> binaryPartitions(int f, double[][] x,int [][] y, double threshold) {
 		HashMap<Integer, double [][]> partition = new HashMap<Integer, double[][]>();
 		List<Integer> leftTlist = new ArrayList<Integer>();
 		List<Integer> rightTlist = new ArrayList<Integer>();
@@ -154,19 +215,25 @@ public class AlgorithmUtils {
 			}
 		}
 		double [][] small = new double [leftTlist.size()][x[0].length];
+		int [][] y_small = new int [leftTlist.size()][y[0].length];
 		int count = 0;
 		for( int j : leftTlist) {
-			small[count] = x[j];
+			small[count] = x[j].clone();
+			y_small[count] = y[j].clone();
 			count++;
 		}
 		double [][] big = new double [rightTlist.size()][x[0].length];
+		int [][] y_big = new int [rightTlist.size()][y[0].length];
 		count = 0;
 		for( int j : rightTlist) {
-			big[count] = x[j];
+			big[count] = x[j].clone();
+			y_big[count] = y[j].clone();
 			count++;
 		}
-		partition.put(0, small);
-		partition.put(1, big);
+		double [][] i_small = concatenate(small,y_small);
+		double [][] i_big = concatenate(big, y_big);
+		partition.put(0, i_small);
+		partition.put(1, i_big);
 		return partition;
 	}
 	// creates the root of the clustering tree and assigns it to a tree
