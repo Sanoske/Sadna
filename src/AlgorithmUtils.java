@@ -108,7 +108,7 @@ public class AlgorithmUtils {
 				for( int k=0; k< x.length - 1; k++) {
 					threshold = (x[k][f]+x[k+1][f])/2;
 					ps = binaryPartitions(f,x,threshold);
-					h = 1 ;//calc h somehow...
+					h = ps.get(0).length* var(ps.get(0));
 					if (h>best.getGain()) {
 						best = new BP(x,y,)	
 					}
