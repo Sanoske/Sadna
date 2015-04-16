@@ -11,7 +11,7 @@ public class BP {
 	private double threshold;
 	
 	//build a return object for bestPartition
-	public BP(double [][] x,int [][] y,int[] x1,int[] x2,int f,double gain,double threshold) {
+	/*public BP(double [][] x,int [][] y,int[] x1,int[] x2,int f,double gain,double threshold) {
 	this.x1 = creatMat(x,x1);
 	this.x2 = creatMat(x,x2);
 	this.y1 = creatMat(y,x1);
@@ -19,11 +19,15 @@ public class BP {
 	this.f = f;
 	this.gain = gain;
 	this.threshold = threshold;
-	}
+	}*/
 	
 	//overloading builders
 	public BP() {
-		this(null,null,null,null,0,Double.MAX_VALUE,0);
+		this.x1 = null;
+		this.x2=null;
+		this.y1=null;
+		this.y2=null;
+		this.gain = Double.MAX_VALUE;
 	}
 	
 	public double [][] getX1() {

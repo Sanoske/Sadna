@@ -26,7 +26,8 @@ public class AlgorithmUtils {
 	}
 
 	private static double[][] concatenate(double[][] x, int[][] y) {
-		double [][] ans = new double [x.length][x[0].length+y[0].length];
+		int len = x[0].length+y[0].length;
+		double [][] ans = new double [x.length][len];
 		for(int i=0;i<x.length;i++)
 			for(int j=0;j<x[0].length;j++)
 				ans[i][j] = x[i][j];
@@ -138,6 +139,8 @@ public class AlgorithmUtils {
 				for( int k=0; k< x.length - 1; k++) {
 					threshold = (x[k][f]+x[k+1][f])/2;
 					ps = binaryPartitions(f,x,y,threshold);
+					if(ps.get(0) == null || ps.get(1) == null)
+						continue;
 					double [][] x_small = extractXMatrix(ps.get(0),x[0].length);
 					int [][] y_small = extractYMatrix(ps.get(0),x[0].length+1, ps.get(0)[0].length);
 					double [][] x_big = extractXMatrix(ps.get(1), x[0].length);
@@ -162,7 +165,7 @@ public class AlgorithmUtils {
 		int [][] ans = new int [ds.length][end-start+1];
 		for(int i=0; i<ds.length; i++)
 			for(int j=start; j<end; j++)
-				ans[i][j] = (int) ds[i][j];
+				ans[i][j-start] = (int) ds[i][j];
 		return ans;
 	}
 
@@ -230,10 +233,14 @@ public class AlgorithmUtils {
 			y_big[count] = y[j].clone();
 			count++;
 		}
-		double [][] i_small = concatenate(small,y_small);
-		double [][] i_big = concatenate(big, y_big);
-		partition.put(0, i_small);
-		partition.put(1, i_big);
+		if( leftTlist.size() != 0) {
+			double [][] i_small = concatenate(small,y_small);
+			partition.put(0, i_small);
+		}
+		if (rightTlist.size() != 0) {
+			double [][] i_big = concatenate(big, y_big);
+			partition.put(1, i_big);
+		}
 		return partition;
 	}
 	// creates the root of the clustering tree and assigns it to a tree
@@ -292,43 +299,5 @@ public class AlgorithmUtils {
 		fcounts[root.getFeatrueNumber()]++;
 		countFeaturesInTree(fcounts, root.getLeftSon());
 		countFeaturesInTree(fcounts, root.getRightSon());
-	}
-
-	public static double[][] readCSV(File file) throws Exception 
-	{
-		Scanner scan = new Scanner(file);
-		ArrayList<double[]> answer = new ArrayList<double[]>();
-		String currLine = scan.nextLine();
-		int size1 = currLine.split("\t").length;
-		while(scan.hasNextLine())
-		{
-			currLine = scan.nextLine();
-			String [] a = currLine.split("\t");
-			double [] a1 = new double [a.length];
-			for(int i=0;i<a.length;i++)
-				a1[i] = Double.parseDouble(a[i]);
-			answer.add(a1);
-		}
-		scan.close();
-		int size2 = answer.size();
-		double [][] answer1 = new  double[size2][size1];
-		for(int i=0;i<size2;i++)
-			for(int j=0;j<size1;j++)
-				answer1[i][j] = answer.get(i)[j];
-		return answer1;
-	}
-	
-	public static void main(String[] args) throws Exception {
-		File file = new File("emotions.csv");
-		double [][] features_and_labels =readCSV(file);
-		double [][] features = new double [features_and_labels.length][features_and_labels[0].length-6];
-		int [][] labels = new int [features_and_labels.length][6]; 
-		for(int i=0;i<features_and_labels.length;i++)
-			for(int j=0;j<features_and_labels[i].length - 6;j++)
-				features[i][j] = features_and_labels[i][j];
-		
-		for(int i=0;i<features_and_labels.length;i++)
-			for(int j=0;j<6;j++)
-				labels[i][j] = (int)features_and_labels[i][j + features_and_labels[i].length - 6];
 	}
 }
