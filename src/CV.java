@@ -42,9 +42,12 @@ public class CV {
 				numOfRows++;
 		
 		double [][] ans = new double [numOfRows][X[0].length];
+		numOfRows = 0;
 		for(int i=0;i<partition.length;i++)
-			if(partition[i] != numberOfTest)
-				ans[i] = X[i].clone();
+			if(partition[i] != numberOfTest) {
+				ans[numOfRows] = X[i].clone();
+				numOfRows++;
+			}
 		return ans;
 	}
 	/* given the partition, extract the train labels */
@@ -55,9 +58,12 @@ public class CV {
 				numOfRows++;
 		
 		int [][] ans = new int [numOfRows][Y[0].length];
+		numOfRows = 0;
 		for(int i=0;i<partition.length;i++)
-			if(partition[i] != numberOfTest)
-				ans[i] = Y[i].clone();
+			if(partition[i] != numberOfTest) {
+				ans[numOfRows] = Y[i].clone();
+				numOfRows++;
+			}
 		return ans;
 	}
 	/* given the partition, extract the test data */
@@ -68,9 +74,12 @@ public class CV {
 				numOfRows++;
 		
 		double [][] ans = new double [numOfRows][X[0].length];
+		numOfRows = 0;
 		for(int i=0;i<partition.length;i++)
-			if(partition[i] == numberOfTest)
-				ans[i] = X[i].clone();
+			if(partition[i] == numberOfTest) {
+				ans[numOfRows] = X[i].clone();
+				numOfRows++;
+			}
 		return ans;
 	}
 	/* given the partition, extract the train labels */
@@ -81,13 +90,16 @@ public class CV {
 				numOfRows++;
 		
 		int [][] ans = new int [numOfRows][Y[0].length];
+		numOfRows = 0;
 		for(int i=0;i<partition.length;i++)
-			if(partition[i] == numberOfTest)
-				ans[i] = Y[i].clone();
+			if(partition[i] == numberOfTest) {
+				ans[numOfRows] = Y[i].clone();
+				numOfRows++;
+			}
 		return ans;
 	}
 	/* get cross validation prediction matrix*/ 
-	public static double [][] CVPredict(double [][] X,int [][] Y, int folds, int ntree, int lambda,int mtry, int sigma0,int n0) {
+	public static double [][] CVPredict(double [][] X,int [][] Y, int folds, int ntree, double lambda,int mtry, int sigma0,int n0) {
 		int [] partition = CVPartition(folds, X.length);
 		int pos;
 		double [][] predict = new double [X.length][Y[0].length];

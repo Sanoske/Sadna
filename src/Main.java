@@ -46,7 +46,15 @@ public class Main {
 		ClusteringTree tree = AlgorithmUtils.RPCT(features, labels,(int)Math.floor(Math.sqrt(features.length)) , 0, 5);
 		System.out.println("built tree");
 		Forest f = new Forest();
-		f.addTree(tree);
+		AlgorithmUtils.BootstrapRF(features, labels, 10, 0.75,(int)Math.floor(Math.sqrt(features.length))
+				, 0, 5, f);
+		System.out.println("built forest");
+		
+		double [][] cv = CV.CVPredict(features, labels, 10, 50, 0.5,(int)Math.floor(Math.sqrt(features.length)) , 0, 5);
+		System.out.println("FINISH");
+		
+		
+		/*f.addTree(tree);
 		double [] predicted_labels = f.RFPredict(features[test], 6);
 		for(int k=0; k<6; k++) {
 			System.out.print(predicted_labels[k] +" ");
@@ -60,6 +68,6 @@ public class Main {
 		System.out.println("precision = " +scores[0]);
 		System.out.println("recall = " +scores[1]);
 		System.out.println("error = " +scores[2]);
-		System.out.println("FPR = " +scores[3]);
+		System.out.println("FPR = " +scores[3]);*/
 	}
 }

@@ -277,10 +277,12 @@ public class AlgorithmUtils {
 		Random r = new Random();
 		for(int j=0; j<n; j++)
 			s.add(r.nextInt(length));
-		Integer [] oldArray = (Integer[]) s.toArray();
-		int [] newArray = new int[oldArray.length];
-		for(int i=0; i<oldArray.length; i++)
-			newArray[i] = (int) oldArray[i];
+		int [] newArray = new int[s.size()];
+		int count = 0;
+		for( int i : s) {
+			newArray[count] = (int) i;
+			count++;
+		}
 		return newArray;
 	}
 
@@ -294,7 +296,7 @@ public class AlgorithmUtils {
 	}
 	/* count the number of times each feature is used in a tree (array of int). */
 	private static void countFeaturesInTree(int[] fcounts, Node root) {
-		if(root == null)
+		if(root.isLeaf())
 			return;
 		fcounts[root.getFeatrueNumber()]++;
 		countFeaturesInTree(fcounts, root.getLeftSon());
