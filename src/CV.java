@@ -107,10 +107,12 @@ public class CV {
 			Forest f = new Forest(); 
 			AlgorithmUtils.BootstrapRF(getXTrain(X,partition,i), getYTrain(Y,partition,i), ntree, lambda, mtry, sigma0, n0, f);
 			pos = 0;
-			for(int j=0;j<getXTest(X,partition,i).length;j++) {
+			int len = getXTest(X,partition,i).length;
+			for(int j=0;j<len;j++) {
 				while(pos < partition.length) {
 					if(partition[pos] == i) {
 						predict[pos] = f.RFPredict(getXTest(X,partition,i)[j], Y[0].length).clone();
+						pos++;
 						break;
 					}
 					pos++;

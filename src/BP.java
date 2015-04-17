@@ -21,7 +21,6 @@ public class BP {
 	this.threshold = threshold;
 	}*/
 	
-	//overloading builders
 	public BP() {
 		this.x1 = null;
 		this.x2=null;
@@ -92,7 +91,7 @@ public class BP {
 	private int [][] setMat(int [][] orig) {
 		int [][] rtrn = new int[orig.length][];
 		for(int i=0;i<orig.length;i++) {
-			rtrn[i] = Arrays.copyOf(orig[i], orig[i].length);
+			rtrn[i] = orig[i].clone();
 		}
 		return rtrn;
 	}
@@ -100,7 +99,7 @@ public class BP {
 	private double [][] setMat(double [][] orig) {
 		double [][] rtrn = new double[orig.length][];
 		for(int i=0;i<orig.length;i++) {
-			rtrn[i] = Arrays.copyOf(orig[i], orig[i].length);
+			rtrn[i] = orig[i].clone();
 		}
 		return rtrn;
 	}

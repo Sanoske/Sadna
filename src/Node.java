@@ -58,7 +58,7 @@ public class Node {
 	private int [][] creatMat(int [][] orig) {
 		int [][] rtrn = new  int[orig.length][];
 		for(int i=0;i<orig.length;i++) {
-			rtrn[i] = Arrays.copyOf(orig[i], orig[i].length);
+			rtrn[i] = orig[i].clone();
 		}
 		return rtrn;
 	}

@@ -142,9 +142,9 @@ public class AlgorithmUtils {
 					if(ps.get(0) == null || ps.get(1) == null)
 						continue;
 					double [][] x_small = extractXMatrix(ps.get(0),x[0].length);
-					int [][] y_small = extractYMatrix(ps.get(0),x[0].length+1, ps.get(0)[0].length);
+					int [][] y_small = extractYMatrix(ps.get(0),x[0].length, ps.get(0)[0].length);
 					double [][] x_big = extractXMatrix(ps.get(1), x[0].length);
-					int [][] y_big = extractYMatrix(ps.get(1), x[0].length+1, ps.get(1)[0].length);
+					int [][] y_big = extractYMatrix(ps.get(1), x[0].length, ps.get(1)[0].length);
 					h = y_small.length*var(y_small) + y_big.length*var(y_big);
 					h = h/ x.length;
 					if (h<best.getGain()) {
@@ -161,7 +161,7 @@ public class AlgorithmUtils {
 		}
 		return best;
 	}
-	private static int[][] extractYMatrix(double[][] ds, int start, int end) {
+	public static int[][] extractYMatrix(double[][] ds, int start, int end) {
 		int [][] ans = new int [ds.length][end-start+1];
 		for(int i=0; i<ds.length; i++)
 			for(int j=start; j<end; j++)
@@ -169,7 +169,7 @@ public class AlgorithmUtils {
 		return ans;
 	}
 
-	private static double[][] extractXMatrix(double[][] ds, int length) {
+	public static double[][] extractXMatrix(double[][] ds, int length) {
 		double [][] ans = new double [ds.length][length];
 		for(int i=0; i<ds.length; i++)
 			for( int j=0; j<length; j++)
@@ -178,7 +178,7 @@ public class AlgorithmUtils {
 	}
 
 	// sort the matrix x with respect to feature number f
-	private static double [][] sortWithRespectToFeature(double[][] x, int f, int [][] y) {
+	public static double [][] sortWithRespectToFeature(double[][] x, int f, int [][] y) {
 		double [][] result = new double [x.length][x[0].length];
 		int [][] y_result = new int [y.length][y[0].length];
 		int min;
