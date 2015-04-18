@@ -125,8 +125,8 @@ public class CV {
 	public static double [] SimplePerformanceScores(int [] Y , double [] predict, double threshold) {
 		int [] YGag = new int [predict.length];
 		for(int i=0;i<predict.length;i++)
-			YGag[i] = (predict[i] > threshold ? 1 : 0);
-		int TP=0,FP=0, FN = 0, TN=0;
+			YGag[i] = (predict[i] >= threshold ? 1 : 0);
+		double TP=0,FP=0, FN = 0, TN=0;
 		for(int i=0;i<predict.length;i++) {
 			if(Y[i] == 1 && YGag[i] == 1)
 				TP++;

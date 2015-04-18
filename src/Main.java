@@ -30,7 +30,7 @@ public class Main {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		int test = 9;
+		int test = 161;
 		File file = new File("emotions.csv");
 		double [][] features_and_labels =readCSV(file);
 		double [][] features = new double [features_and_labels.length][features_and_labels[0].length-6];
@@ -47,60 +47,20 @@ public class Main {
 		AlgorithmUtils.BootstrapRF(features, labels, 2, 0.5,(int)Math.floor(Math.sqrt(features.length)) , 0, 5, f);
 		double [][] cv = CV.CVPredict(features, labels, 10, 50, 0.5,(int)Math.floor(Math.sqrt(features.length)) , 0, 5);
 		System.out.println("FINISH CV");
-		int [] partition = CV.CVPartition(10, features.length);
-		int [] count = new int [10];
-		for(int i=0; i<partition.length; i++)
-			count[partition[i]]++;
-		System.out.print("Partition: ");
-		for(int i=0; i<10; i++)
-			System.out.print(i+": "+count[i]+ "  ");
 		System.out.println();
-		double [][] test5 = CV.getXTest(features, partition, 5);
-		double [][] train5 = CV.getXTrain(features, partition, 5);
-		for(int k=0; k<6; k++) {
-			System.out.print(cv[test][k] +" ");
+		double [] predict0 = new double [cv.length];
+		int [] label0 = new int [cv.length];
+		for(int i=0; i<cv.length; i++) {
+			predict0[i] = cv[i][0];
+			label0[i] = labels[i][0];
 		}
-		System.out.println(" ");
-		for(int l=0; l<6; l++) {
-			System.out.print(labels[test][l] +" ");
-		}
-		System.out.println();
-		System.out.println("REAL FINISH");
+		double [] ans = CV.SimplePerformanceScores(label0, predict0, 0.5);
+		System.out.println("precision = "+ans[0]);
+		System.out.println("recall = "+ans[1]);
+		System.out.println("error = "+ans[2]);
+		System.out.println("FPR = "+ans[3]);
 		
-		/*double [][] x_temp = new double[10][features[0].length];
-		int [][] y_temp = new int[10][labels.length];
-		for(int i=0; i<10; i++) {
-			x_temp[i] = features[i].clone();
-			y_temp[i] = labels[i].clone();
-		}
-		System.out.println("Not sorted");
-		for(int i=0; i<10; i++) {
-			for(int j=0; j<x_temp[0].length;j++)
-				System.out.print(x_temp[i][j]+ " ");
-			System.out.println();
-		}
-		System.out.println(); System.out.println();
-		for(int i=0; i<10; i++) {
-			for(int j=0; j<y_temp[0].length;j++)
-				System.out.print(y_temp[i][j]+ " ");
-			System.out.println();
-		}
-		System.out.println(); System.out.println();
-		System.out.println("Sorted");
-		x_temp = AlgorithmUtils.sortWithRespectToFeature(x_temp, 0, y_temp);
-		for(int i=0; i<10; i++) {
-			for(int j=0; j<x_temp[0].length;j++)
-				System.out.print(x_temp[i][j]+ " ");
-			System.out.println();
-		}
-		System.out.println(); System.out.println();
-		for(int i=0; i<10; i++) {
-			for(int j=0; j<y_temp[0].length;j++)
-				System.out.print(y_temp[i][j]+ " ");
-			System.out.println();
-		}
-		
-		x_temp = AlgorithmUtils.extractXMatrix(features_and_labels, features[0].length);
-		y_temp = AlgorithmUtils.extractYMatrix(features_and_labels, features[0].length, features[0].length+6);*/
+		//double precision_recall = CV.AUCcurve(label0, predict0, false);
+		//System.out.println(precision_recall);
 	}
 }
