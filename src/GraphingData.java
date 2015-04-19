@@ -1,49 +1,70 @@
 import java.awt.*;
-import java.awt.geom.*;
 import javax.swing.*;
-
-public class GraphingData extends JPanel {
-    int[] data = {
-        21, 14, 18, 03, 86, 88, 74, 87, 54, 77,
-        61, 55, 48, 60, 49, 36, 38, 27, 20, 18
-    };
-    final int PAD = 20;
  
-    protected void paintComponent(Graphics g) {
+@SuppressWarnings("serial")
+public class GraphingData extends JPanel
+{
+    int PAD = 20;
+    boolean drawLine = true;
+    boolean drawDots = true;
+    int dotRadius = 3;
+    double [] x_data;
+    double [] data;
+    public GraphingData (double [] x, double [] y) {
+    	x_data = x.clone();
+    	data = y.clone();
+    }
+ 
+    protected void paintComponent (Graphics g)
+    {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D)g;
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                            RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         int w = getWidth();
         int h = getHeight();
-        // Draw ordinate.
-        g2.draw(new Line2D.Double(PAD, PAD, PAD, h-PAD));
-        // Draw abcissa.
-        g2.draw(new Line2D.Double(PAD, h-PAD, w-PAD, h-PAD));
-        double xInc = (double)(w - 2*PAD)/(data.length-1);
-        double scale = (double)(h - 2*PAD)/getMax();
-        // Mark data points.
-        g2.setPaint(Color.red);
-        for(int i = 0; i < data.length; i++) {
-            double x = PAD + i*xInc;
-            double y = h - PAD - scale*data[i];
-            g2.fill(new Ellipse2D.Double(x-2, y-2, 4, 4));
+        g2.drawLine(PAD, PAD, PAD, h-PAD);
+        g2.drawLine(PAD, h-PAD, w-PAD, h-PAD);
+        double xScale = (w - 2*PAD) / (data.length + 1);
+        //double maxValue = 30.0;
+        double yScale = (h - 2*PAD)/(data.length + 1);
+        // The origin location
+        int x0 = PAD;
+        int y0 = h-PAD;
+        
+        // draw connecting line
+        if (drawLine)
+        {
+            for (int j = 0; j < data.length-1; j++)
+            {
+                int x1 = x0 + (int)(xScale * x_data[j]);
+                int y1 = y0 - (int)(yScale * data[j]);
+                int x2 = x0 + (int)(xScale * x_data[j+1]);
+                int y2 = y0 - (int)(yScale * data[j+1]);
+                g2.drawLine(x1, y1, x2, y2);
+            }
+        }
+
+        // draw the points as little circles in red
+        if (drawDots)
+        {
+            g2.setPaint(Color.red);
+            for (int j = 0; j < data.length; j++)
+            {
+                int x = x0 + (int)(xScale * x_data[j]);
+                int y = y0 - (int)(yScale * data[j]);
+                g2.fillOval(x-dotRadius, y-dotRadius, 2*dotRadius, 2*dotRadius);
+            }
         }
     }
- 
-    private int getMax() {
-        int max = -Integer.MAX_VALUE;
-        for(int i = 0; i < data.length; i++) {
-            if(data[i] > max)
-                max = data[i];
-        }
-        return max;
-    }
- 
-    public static void main(String[] args) {
+
+    public static void main(String[] args)
+    {
+    	double [] x = {0,1,2,3,4,5};
+    	double [] y = {0,1,2,3,4,5};
         JFrame f = new JFrame();
+        f.setTitle("AUC curve");
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.add(new GraphingData());
+        f.getContentPane().add(new GraphingData(x,y));
         f.setSize(400,400);
         f.setLocation(200,200);
         f.setVisible(true);

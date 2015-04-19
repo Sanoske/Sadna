@@ -1,4 +1,4 @@
-import java.util.Arrays;
+//import java.util.Arrays;
 
 
 public class BP {
@@ -72,7 +72,7 @@ public class BP {
 		this.threshold = threshold;
 	}
 	
-	private int [][] creatMat(int [][] orig,int[] index) {
+	/*private int [][] creatMat(int [][] orig,int[] index) {
 		int [][] rtrn = new int[index.length][];
 		for(int i=0;i<index.length;i++) {
 			rtrn[i] = Arrays.copyOf(orig[index[i]], orig[index[i]].length);
@@ -86,7 +86,7 @@ public class BP {
 			rtrn[i] = Arrays.copyOf(orig[index[i]], orig[index[i]].length);
 		}
 		return rtrn;
-	}
+	}*/
 	
 	private int [][] setMat(int [][] orig) {
 		int [][] rtrn = new int[orig.length][];

@@ -1,6 +1,8 @@
+import java.lang.management.PlatformManagedObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -145,41 +147,63 @@ public class CV {
 		return ans;
 	}
 	
+	@SuppressWarnings("static-access")
 	public static double AUCcurve(int [] Y, double [] predict, boolean roc) {
 		double [] thrs = predict.clone();
 		Arrays.sort(thrs);
-		double[] plotX = new double[thrs.length];
-		double[] plotY = new double[thrs.length];
+		List <Double> plotX_temp = new LinkedList<Double>();
+		List <Double> plotY_temp = new LinkedList<Double>();
 		double[] sps = new double[4];
 		for(int i=0;i<thrs.length;i++) {
 			sps = SimplePerformanceScores(Y,predict,thrs[i]);
 			if (roc) {
-				plotX[i] = sps[recall];
-				plotY[i] = sps[FPR];
+				if(!contain(sps[recall],plotX_temp)) {
+						plotX_temp.add(sps[recall]);
+						plotY_temp.add(sps[FPR]);
+					}
 			}
 			else {
-				plotX[i] = sps[precision];
-				plotY[i] = sps[recall];
+				if(!contain(sps[precision],plotX_temp)) {
+					plotX_temp.add(sps[precision]);
+					plotY_temp.add(sps[recall]);
+				}
 			}
 		}
+		double [] plotX = new double [plotX_temp.size()];
+		double [] plotY = new double [plotX_temp.size()];
+		for(int j=0; j<plotX.length; j++) {
+			plotX[j] = plotX_temp.get(j);
+			plotY[j] = plotY_temp.get(j);
+		}
+		sortAccordingToX(plotX,plotY);
 		UnivariateInterpolator interpolator = new SplineInterpolator();
 		UnivariateFunction function = interpolator.interpolate(plotX, plotY); //interpolating the plot to a function using cubic spline
-		SimpsonIntegrator integrator = new SimpsonIntegrator();
+		SimpsonIntegrator integrator = new SimpsonIntegrator(1,SimpsonIntegrator.SIMPSON_MAX_ITERATIONS_COUNT);
 		
-		double auc = integrator.integrate(10, function, getMinMax(plotX,"min"), getMinMax(plotX,"max"));
+		double auc = integrator.integrate(integrator.SIMPSON_MAX_ITERATIONS_COUNT, function, plotX[0], plotX[plotX.length-1]);
 		return auc;
 	}
-	//a method to get a min/max value of an array
-	private static double getMinMax(double[] plotX, String minmax) {
-		double value = plotX[0];
-		for(int i=1;i<plotX.length;i++) {
-			if (minmax.equals("min") && plotX[i]<value) {
-				value = plotX[i];
-			}
-			if (minmax.equals("max") && plotX[i]>value) {
-				value = plotX[i];
+	// sort x coordinate, and match the y coordinate according to it
+	private static void sortAccordingToX(double[] plotX, double[] plotY) {
+		double temp;
+		for(int i=0; i<plotX.length-1; i++) {
+			for(int j=i+1; j<plotX.length; j++){
+				if(plotX[i] > plotX[j]) {
+					temp = plotX[i];
+					plotX[i] = plotX[j];
+					plotX[j] = temp;
+					temp = plotY[i];
+					plotY[i] = plotY[j];
+					plotY[j] = temp;
+				}
 			}
 		}
-		return value;
+	}
+	// check if d is in plotX
+	private static boolean contain(double d, List <Double> plotX) {
+		for( double num : plotX)
+			if(num == d)
+				return true;
+		return false;
 	}
 }

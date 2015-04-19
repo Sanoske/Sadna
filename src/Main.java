@@ -30,7 +30,7 @@ public class Main {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		int test = 161;
+		int [] ntree_array = {1,10,50,100};
 		File file = new File("emotions.csv");
 		double [][] features_and_labels =readCSV(file);
 		double [][] features = new double [features_and_labels.length][features_and_labels[0].length-6];
@@ -43,16 +43,24 @@ public class Main {
 			for(int j=0;j<6;j++)
 				labels[i][j] = (int)features_and_labels[i][j + features_and_labels[i].length - 6];
 		
-		Forest f = new Forest();
-		AlgorithmUtils.BootstrapRF(features, labels, 2, 0.5,(int)Math.floor(Math.sqrt(features.length)) , 0, 5, f);
-		double [][] cv = CV.CVPredict(features, labels, 10, 50, 0.5,(int)Math.floor(Math.sqrt(features.length)) , 0, 5);
+		for(int ntree : ntree_array) {
+			double [][] cv = CV.CVPredict(features, labels, 10, ntree, 0.5,(int)Math.floor(Math.sqrt(features.length)) , 0, 5);
+			double [] predict = new double [cv.length];
+			int [] label = new int [cv.length];
+			for(int i=0; i<cv.length; i++) {
+				predict[i] = cv[i][3];
+				label[i] = labels[i][3];
+			}
+		}
+		/*double [][] cv1 = CV.CVPredict(features, labels, 10, 1, 0.5,(int)Math.floor(Math.sqrt(features.length)) , 0, 5);
 		System.out.println("FINISH CV");
 		System.out.println();
-		double [] predict0 = new double [cv.length];
-		int [] label0 = new int [cv.length];
-		for(int i=0; i<cv.length; i++) {
-			predict0[i] = cv[i][0];
-			label0[i] = labels[i][0];
+		double [] predict;
+		int [] label;
+		getPredictAndLabels(predict,label);
+		for(int i=0; i<cv1.length; i++) {
+			predict[i] = cv1[i][3];
+			label[i] = labels[i][3];
 		}
 		double [] ans = CV.SimplePerformanceScores(label0, predict0, 0.5);
 		System.out.println("precision = "+ans[0]);
@@ -60,7 +68,9 @@ public class Main {
 		System.out.println("error = "+ans[2]);
 		System.out.println("FPR = "+ans[3]);
 		
-		//double precision_recall = CV.AUCcurve(label0, predict0, false);
-		//System.out.println(precision_recall);
+		double precision_recall = CV.AUCcurve(label0, predict0, false);
+		System.out.println(precision_recall);
+	}*/
+		
 	}
 }
