@@ -296,7 +296,7 @@ public class AlgorithmUtils {
 	}
 	/* count the number of times each feature is used in a tree (array of int). */
 	private static void countFeaturesInTree(int[] fcounts, Node root) {
-		if(root.isLeaf())
+		if(root == null || root.isLeaf())
 			return;
 		fcounts[root.getFeatrueNumber()]++;
 		countFeaturesInTree(fcounts, root.getLeftSon());

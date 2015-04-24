@@ -4,7 +4,21 @@ import java.util.Scanner;
 
 
 public class Main {
-	
+	public static Forest RF_PCT(double [][] x, int [][] y, int ntree, int mtry,
+								int sigma0, int n0, double lambda) {
+		Forest f = new Forest ();
+		AlgorithmUtils.BootstrapRF(x, y, ntree, lambda, mtry, sigma0, n0, f);
+		return f;
+	}
+	// given model f, matrix data x 
+	// and number of labels for each sample, returns the predictions for x 
+	// (double values, also known as probability predictions)
+	public static double [][] RF_PCT_predict (Forest f, double [][] x, int numOfLabels) {
+		double [][] y = new double [x.length][];
+		for( int i=0; i<x.length; i++)
+			y[i] = f.RFPredict(x[i], numOfLabels).clone();
+		return y;
+	}
 	public static double[][] readCSV(File file) throws Exception 
 	{
 		Scanner scan = new Scanner(file);
@@ -43,7 +57,7 @@ public class Main {
 			for(int j=0;j<6;j++)
 				labels[i][j] = (int)features_and_labels[i][j + features_and_labels[i].length - 6];
 		
-		for(int ntree : ntree_array) {
+		/*for(int ntree : ntree_array) {
 			double [][] cv = CV.CVPredict(features, labels, 10, ntree, 0.5,(int)Math.floor(Math.sqrt(features.length)) , 0, 5);
 			double [] predict = new double [cv.length];
 			int [] label = new int [cv.length];
@@ -51,26 +65,29 @@ public class Main {
 				predict[i] = cv[i][3];
 				label[i] = labels[i][3];
 			}
-		}
-		/*double [][] cv1 = CV.CVPredict(features, labels, 10, 1, 0.5,(int)Math.floor(Math.sqrt(features.length)) , 0, 5);
+		}*/
+		double [][] cv1 = CV.CVPredict(features, labels, 10, 1, 0.5,(int)Math.floor(Math.sqrt(features.length)) , 0, 5);
 		System.out.println("FINISH CV");
 		System.out.println();
-		double [] predict;
-		int [] label;
-		getPredictAndLabels(predict,label);
+		double [] predict = new double [cv1.length];
+		int [] label = new int [cv1.length];
 		for(int i=0; i<cv1.length; i++) {
 			predict[i] = cv1[i][3];
 			label[i] = labels[i][3];
 		}
-		double [] ans = CV.SimplePerformanceScores(label0, predict0, 0.5);
+		Forest f = new Forest();
+		int [] times = AlgorithmUtils.BootstrapRF(features, labels, 1, 0.5,(int)Math.floor(Math.sqrt(features.length)) , 0, 5, f);
+		double [] ans = CV.SimplePerformanceScores(label, predict, 0.5);
 		System.out.println("precision = "+ans[0]);
 		System.out.println("recall = "+ans[1]);
 		System.out.println("error = "+ans[2]);
 		System.out.println("FPR = "+ans[3]);
 		
-		double precision_recall = CV.AUCcurve(label0, predict0, false);
+		double precision_recall = CV.AUCcurve(label, predict, false);
 		System.out.println(precision_recall);
-	}*/
+		
+		for(int i=0; i<times.length; i++)
+			System.out.println("featrue numbber "+i+" appears "+times[i]+ " times");
 		
 	}
 }
