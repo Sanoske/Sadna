@@ -34,7 +34,7 @@ public class Main {
 			y[i] = f.RFPredict(x[i], numOfLabels).clone();
 		return y;
 	}
-	
+	// read a CSV file and put it in matrix
 	public static double[][] readCSV(File file) throws Exception 
 	{
 		Scanner scan = new Scanner(file);
@@ -61,7 +61,7 @@ public class Main {
 	
 	public static void main(String[] args) throws Exception {
 		int [] ntree_array = {1,10,50,100};
-		double precision_recall;
+		double precision_recall, roc;
 		File file = new File("emotions.csv");
 		double [][] features_and_labels =readCSV(file);
 		double [][] features = new double [features_and_labels.length][features_and_labels[0].length-6];
@@ -84,6 +84,7 @@ public class Main {
 			}
 			for(int j=0; j<6; j++) {
 				precision_recall = CV.AUCcurve(extractcolumn(label,j), extractcolumn(predict,j), false);
+				roc = CV.AUCcurve(extractcolumn(label,j), extractcolumn(predict,j), true);
 				//PLOT THE GRAPH
 			}
 		}
