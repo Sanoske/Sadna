@@ -67,6 +67,7 @@ public class Main {
 		double [] plotX = new double [ntree_array.length]; 
 		double [] plotY_roc = new double [ntree_array.length];
 		double [] plotY_precision = new double [ntree_array.length];
+		double [] plotY_error = new double [ntree_array.length];
 		File file = new File("emotions.csv");
 		double [][] features_and_labels =readCSV(file);
 		double [][] features = new double [features_and_labels.length][features_and_labels[0].length-6];
@@ -78,8 +79,9 @@ public class Main {
 		for(int i=0;i<features_and_labels.length;i++)
 			for(int j=0;j<6;j++)
 				labels[i][j] = (int)features_and_labels[i][j + features_and_labels[i].length - 6];
-		int count = 0;
+		int count;
 		for(int j=0; j<6; j++) {
+			count = 0;
 			for(int ntree : ntree_array) {
 				double [][] cv = CV.CVPredict(features, labels, 10, ntree, 0.5,(int)Math.floor(Math.sqrt(features.length)) , 0, 5);
 				double [][] predict = new double [cv.length][];
@@ -93,9 +95,12 @@ public class Main {
 				plotX[count] = ntree;
 				plotY_roc[count] = roc;
 				plotY_precision[count] = precision_recall;
+				plotY_error[count] = CV.SimplePerformanceScores(extractcolumn(label,j), extractcolumn(predict,j), 0.5)[2];
+				count++;
 			}
 			paintToFile(plotX,plotY_precision,"Precision-Recall curve. label "+j);
 			paintToFile(plotX,plotY_roc,"roc AUC curve. label "+j);
+			paintToFile(plotX,plotY_error,"error rate. label "+j);
 		}
 		/*double [][] cv1 = CV.CVPredict(features, labels, 10, 1, 0.5,(int)Math.floor(Math.sqrt(features.length)) , 0, 5);
 		System.out.println("FINISH CV");
