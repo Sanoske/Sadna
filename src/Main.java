@@ -2,6 +2,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import javax.swing.JFrame;
+
 
 public class Main {
 	// extract specific colums out of the matrix
@@ -61,7 +63,10 @@ public class Main {
 	
 	public static void main(String[] args) throws Exception {
 		int [] ntree_array = {1,10,50,100};
-		double precision_recall, roc;
+		double   precision_recall ,roc;
+		double [] plotX = new double [ntree_array.length]; 
+		double [] plotY_roc = new double [ntree_array.length];
+		double [] plotY_precision = new double [ntree_array.length];
 		File file = new File("emotions.csv");
 		double [][] features_and_labels =readCSV(file);
 		double [][] features = new double [features_and_labels.length][features_and_labels[0].length-6];
@@ -73,20 +78,24 @@ public class Main {
 		for(int i=0;i<features_and_labels.length;i++)
 			for(int j=0;j<6;j++)
 				labels[i][j] = (int)features_and_labels[i][j + features_and_labels[i].length - 6];
-		
-		for(int ntree : ntree_array) {
-			double [][] cv = CV.CVPredict(features, labels, 10, ntree, 0.5,(int)Math.floor(Math.sqrt(features.length)) , 0, 5);
-			double [][] predict = new double [cv.length][];
-			int [][] label = new int [cv.length][];
-			for(int i=0; i<cv.length; i++) {
-				predict[i] = cv[i].clone();
-				label[i] = labels[i].clone();
+		int count = 0;
+		for(int j=0; j<6; j++) {
+			for(int ntree : ntree_array) {
+				double [][] cv = CV.CVPredict(features, labels, 10, ntree, 0.5,(int)Math.floor(Math.sqrt(features.length)) , 0, 5);
+				double [][] predict = new double [cv.length][];
+				int [][] label = new int [cv.length][];
+				for(int i=0; i<cv.length; i++) {
+					predict[i] = cv[i].clone();
+					label[i] = labels[i].clone();
+				}
+				precision_recall = CV.AUCcurve(extractcolumn(label,j) ,extractcolumn(predict,j), false);
+				roc = CV.AUCcurve(extractcolumn(label,j) ,extractcolumn(predict,j), true);
+				plotX[count] = ntree;
+				plotY_roc[count] = roc;
+				plotY_precision[count] = precision_recall;
 			}
-			for(int j=0; j<6; j++) {
-				precision_recall = CV.AUCcurve(extractcolumn(label,j), extractcolumn(predict,j), false);
-				roc = CV.AUCcurve(extractcolumn(label,j), extractcolumn(predict,j), true);
-				//PLOT THE GRAPH
-			}
+			paintToFile(plotX,plotY_precision,"Precision-Recall curve. label "+j);
+			paintToFile(plotX,plotY_roc,"roc AUC curve. label "+j);
 		}
 		/*double [][] cv1 = CV.CVPredict(features, labels, 10, 1, 0.5,(int)Math.floor(Math.sqrt(features.length)) , 0, 5);
 		System.out.println("FINISH CV");
@@ -111,5 +120,15 @@ public class Main {
 		for(int i=0; i<times.length; i++)
 			System.out.println("featrue numbber "+i+" appears "+times[i]+ " times");*/
 		
+	}
+	private static void paintToFile(double[] plotX, double[] plotY,String s) {
+		 int width = 400, height = 400;
+	        JFrame f = new JFrame();
+	        f.setTitle(s);
+	        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	        f.add(new GraphingData(plotX,plotY,width,height,s));
+	        f.setSize(width,height);
+	        f.setLocation(200,200);
+	        f.setVisible(true);		
 	}
 }
