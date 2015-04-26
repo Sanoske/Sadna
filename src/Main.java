@@ -4,6 +4,21 @@ import java.util.Scanner;
 
 
 public class Main {
+	// extract specific colums out of the matrix
+	public static int [] extractcolumn(int [][] a, int column) {
+		int [] ans = new int [a.length];
+		for(int i=0; i<a.length; i++)
+			ans[i] = a[i][column];
+		return ans;
+	}
+	// extract specific colums out of the matrix
+	public static double [] extractcolumn(double [][] a, int column) {
+		double [] ans = new double [a.length];
+		for(int i=0; i<a.length; i++)
+			ans[i] = a[i][column];
+		return ans;
+	}
+	// build random forest
 	public static Forest RF_PCT(double [][] x, int [][] y, int ntree, int mtry,
 								int sigma0, int n0, double lambda) {
 		Forest f = new Forest ();
@@ -19,6 +34,7 @@ public class Main {
 			y[i] = f.RFPredict(x[i], numOfLabels).clone();
 		return y;
 	}
+	
 	public static double[][] readCSV(File file) throws Exception 
 	{
 		Scanner scan = new Scanner(file);
@@ -45,6 +61,7 @@ public class Main {
 	
 	public static void main(String[] args) throws Exception {
 		int [] ntree_array = {1,10,50,100};
+		double precision_recall;
 		File file = new File("emotions.csv");
 		double [][] features_and_labels =readCSV(file);
 		double [][] features = new double [features_and_labels.length][features_and_labels[0].length-6];
@@ -57,16 +74,20 @@ public class Main {
 			for(int j=0;j<6;j++)
 				labels[i][j] = (int)features_and_labels[i][j + features_and_labels[i].length - 6];
 		
-		/*for(int ntree : ntree_array) {
+		for(int ntree : ntree_array) {
 			double [][] cv = CV.CVPredict(features, labels, 10, ntree, 0.5,(int)Math.floor(Math.sqrt(features.length)) , 0, 5);
-			double [] predict = new double [cv.length];
-			int [] label = new int [cv.length];
+			double [][] predict = new double [cv.length][];
+			int [][] label = new int [cv.length][];
 			for(int i=0; i<cv.length; i++) {
-				predict[i] = cv[i][3];
-				label[i] = labels[i][3];
+				predict[i] = cv[i].clone();
+				label[i] = labels[i].clone();
 			}
-		}*/
-		double [][] cv1 = CV.CVPredict(features, labels, 10, 1, 0.5,(int)Math.floor(Math.sqrt(features.length)) , 0, 5);
+			for(int j=0; j<6; j++) {
+				precision_recall = CV.AUCcurve(extractcolumn(label,j), extractcolumn(predict,j), false);
+				//PLOT THE GRAPH
+			}
+		}
+		/*double [][] cv1 = CV.CVPredict(features, labels, 10, 1, 0.5,(int)Math.floor(Math.sqrt(features.length)) , 0, 5);
 		System.out.println("FINISH CV");
 		System.out.println();
 		double [] predict = new double [cv1.length];
@@ -83,11 +104,11 @@ public class Main {
 		System.out.println("error = "+ans[2]);
 		System.out.println("FPR = "+ans[3]);
 		
-		double precision_recall = CV.AUCcurve(label, predict, false);
+		precision_recall = CV.AUCcurve(label, predict, false);
 		System.out.println(precision_recall);
 		
 		for(int i=0; i<times.length; i++)
-			System.out.println("featrue numbber "+i+" appears "+times[i]+ " times");
+			System.out.println("featrue numbber "+i+" appears "+times[i]+ " times");*/
 		
 	}
 }
