@@ -80,27 +80,28 @@ public class Main {
 			for(int j=0;j<6;j++)
 				labels[i][j] = (int)features_and_labels[i][j + features_and_labels[i].length - 6];
 		int count;
-		for(int j=0; j<6; j++) {
+		for(int ntree : ntree_array){ //for(int j=0; j<6; j++) {
 			count = 0;
-			for(int ntree : ntree_array) {
-				double [][] cv = CV.CVPredict(features, labels, 10, ntree, 0.5,(int)Math.floor(Math.sqrt(features.length)) , 0, 5);
-				double [][] predict = new double [cv.length][];
-				int [][] label = new int [cv.length][];
-				for(int i=0; i<cv.length; i++) {
-					predict[i] = cv[i].clone();
-					label[i] = labels[i].clone();
-				}
+			double [][] cv = CV.CVPredict(features, labels, 10, ntree, 0.5,(int)Math.floor(Math.sqrt(features.length)) , 0, 5);
+			double [][] predict = new double [cv.length][];
+			int [][] label = new int [cv.length][];
+			for(int i=0; i<cv.length; i++) {
+				predict[i] = cv[i].clone();
+				label[i] = labels[i].clone();
+			}
+			for(int j=0; j<6; j++) { //for(int ntree : ntree_array)  {
 				precision_recall = CV.AUCcurve(extractcolumn(label,j) ,extractcolumn(predict,j), false);
 				roc = CV.AUCcurve(extractcolumn(label,j) ,extractcolumn(predict,j), true);
 				plotX[count] = ntree;
 				plotY_roc[count] = roc;
 				plotY_precision[count] = precision_recall;
 				plotY_error[count] = CV.SimplePerformanceScores(extractcolumn(label,j), extractcolumn(predict,j), 0.5)[2];
+				paintToFile(plotX,plotY_precision,"Precision-Recall curve. label "+j);
+				paintToFile(plotX,plotY_roc,"roc AUC curve. label "+j);
+				paintToFile(plotX,plotY_error,"error rate. label "+j);
 				count++;
 			}
-			paintToFile(plotX,plotY_precision,"Precision-Recall curve. label "+j);
-			paintToFile(plotX,plotY_roc,"roc AUC curve. label "+j);
-			paintToFile(plotX,plotY_error,"error rate. label "+j);
+			
 		}
 		/*double [][] cv1 = CV.CVPredict(features, labels, 10, 1, 0.5,(int)Math.floor(Math.sqrt(features.length)) , 0, 5);
 		System.out.println("FINISH CV");
