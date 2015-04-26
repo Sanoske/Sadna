@@ -62,12 +62,12 @@ public class Main {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		int [] ntree_array = {1,10,50,100};
+		int [] ntree_array = {1,10,25,50,100};
 		double   precision_recall ,roc;
-		double [] plotX = new double [ntree_array.length]; 
-		double [] plotY_roc = new double [ntree_array.length];
-		double [] plotY_precision = new double [ntree_array.length];
-		double [] plotY_error = new double [ntree_array.length];
+		double [][] plotX = new double [ntree_array.length][6]; 
+		double [][] plotY_roc = new double [ntree_array.length][6];
+		double [][] plotY_precision = new double [ntree_array.length][6];
+		double [][] plotY_error = new double [ntree_array.length][6];
 		File file = new File("emotions.csv");
 		double [][] features_and_labels =readCSV(file);
 		double [][] features = new double [features_and_labels.length][features_and_labels[0].length-6];
@@ -80,7 +80,7 @@ public class Main {
 			for(int j=0;j<6;j++)
 				labels[i][j] = (int)features_and_labels[i][j + features_and_labels[i].length - 6];
 		int count;
-		for(int ntree : ntree_array){ //for(int j=0; j<6; j++) {
+		for(int ntree : ntree_array){
 			count = 0;
 			double [][] cv = CV.CVPredict(features, labels, 10, ntree, 0.5,(int)Math.floor(Math.sqrt(features.length)) , 0, 5);
 			double [][] predict = new double [cv.length][];
@@ -89,19 +89,21 @@ public class Main {
 				predict[i] = cv[i].clone();
 				label[i] = labels[i].clone();
 			}
-			for(int j=0; j<6; j++) { //for(int ntree : ntree_array)  {
+			for(int j=0; j<6; j++) { 
 				precision_recall = CV.AUCcurve(extractcolumn(label,j) ,extractcolumn(predict,j), false);
 				roc = CV.AUCcurve(extractcolumn(label,j) ,extractcolumn(predict,j), true);
-				plotX[count] = ntree;
-				plotY_roc[count] = roc;
-				plotY_precision[count] = precision_recall;
-				plotY_error[count] = CV.SimplePerformanceScores(extractcolumn(label,j), extractcolumn(predict,j), 0.5)[2];
-				paintToFile(plotX,plotY_precision,"Precision-Recall curve. label "+j);
-				paintToFile(plotX,plotY_roc,"roc AUC curve. label "+j);
-				paintToFile(plotX,plotY_error,"error rate. label "+j);
+				plotX[count][j] = ntree;
+				plotY_roc[count][j] = roc;
+				plotY_precision[count][j] = precision_recall;
+				plotY_error[count][j] = CV.SimplePerformanceScores(extractcolumn(label,j), extractcolumn(predict,j), 0.5)[2];
 				count++;
 			}
 			
+		}
+		for(int j=0; j<6; j++) {
+				paintToFile(extractcolumn(plotX,j),extractcolumn(plotY_precision,j),"Precision-Recall curve. label "+j);
+				paintToFile(extractcolumn(plotX,j),extractcolumn(plotY_roc,j),"roc AUC curve. label "+j);
+				paintToFile(extractcolumn(plotX,j),extractcolumn(plotY_error,j),"error rate. label "+j);
 		}
 		/*double [][] cv1 = CV.CVPredict(features, labels, 10, 1, 0.5,(int)Math.floor(Math.sqrt(features.length)) , 0, 5);
 		System.out.println("FINISH CV");
