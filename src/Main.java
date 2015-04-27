@@ -62,7 +62,11 @@ public class Main {
 	}
 	
 	public static void main(String[] args) throws Exception {
+		System.out.println("START");
+		JFrame f = new JFrame();
+		long start_global = System.nanoTime();
 		int [] ntree_array = {1,10,25,50,100};
+		int [] mtry_array = {5,10,20,40};
 		double   precision_recall ,roc;
 		double [][] plotX = new double [ntree_array.length][6]; 
 		double [][] plotY_roc = new double [ntree_array.length][6];
@@ -79,9 +83,9 @@ public class Main {
 		for(int i=0;i<features_and_labels.length;i++)
 			for(int j=0;j<6;j++)
 				labels[i][j] = (int)features_and_labels[i][j + features_and_labels[i].length - 6];
-		int count;
-		for(int ntree : ntree_array){
-			count = 0;
+		int count = 0;
+		for(int ntree : ntree_array) {
+			System.out.println(ntree+ " trees");
 			double [][] cv = CV.CVPredict(features, labels, 10, ntree, 0.5,(int)Math.floor(Math.sqrt(features.length)) , 0, 5);
 			double [][] predict = new double [cv.length][];
 			int [][] label = new int [cv.length][];
@@ -96,47 +100,79 @@ public class Main {
 				plotY_roc[count][j] = roc;
 				plotY_precision[count][j] = precision_recall;
 				plotY_error[count][j] = CV.SimplePerformanceScores(extractcolumn(label,j), extractcolumn(predict,j), 0.5)[2];
-				count++;
 			}
-			
+			count++;
 		}
 		for(int j=0; j<6; j++) {
-				paintToFile(extractcolumn(plotX,j),extractcolumn(plotY_precision,j),"Precision-Recall curve. label "+j);
-				paintToFile(extractcolumn(plotX,j),extractcolumn(plotY_roc,j),"roc AUC curve. label "+j);
-				paintToFile(extractcolumn(plotX,j),extractcolumn(plotY_error,j),"error rate. label "+j);
+				paintToFile(f,extractcolumn(plotX,j),extractcolumn(plotY_precision,j),"Precision-Recall curve. label "+j);
+				paintToFile(f,extractcolumn(plotX,j),extractcolumn(plotY_roc,j),"roc AUC curve. label "+j);
+				paintToFile(f,extractcolumn(plotX,j),extractcolumn(plotY_error,j),"error rate. label "+j);
 		}
-		/*double [][] cv1 = CV.CVPredict(features, labels, 10, 1, 0.5,(int)Math.floor(Math.sqrt(features.length)) , 0, 5);
-		System.out.println("FINISH CV");
 		System.out.println();
-		double [] predict = new double [cv1.length];
-		int [] label = new int [cv1.length];
-		for(int i=0; i<cv1.length; i++) {
-			predict[i] = cv1[i][3];
-			label[i] = labels[i][3];
+		int ntree = 100;
+		double error;
+		Forest forest = new Forest();
+		int [] count_featrues;
+		count_featrues = AlgorithmUtils.BootstrapRF(features, labels, ntree, 0.5, (int)Math.floor(Math.sqrt(features.length)), 0, 5, forest);
+		rankFeatures(count_featrues);
+		System.out.println();
+		for(int mtry : mtry_array) {
+			long start = System.nanoTime();
+			double [][] cv = CV.CVPredict(features, labels, 10, ntree, 0.5,mtry , 0, 5);
+			double [][] predict = new double [cv.length][];
+			int [][] label = new int [cv.length][];
+			for(int i=0; i<cv.length; i++) {
+				predict[i] = cv[i].clone();
+				label[i] = labels[i].clone();
+			}
+			System.out.println();
+			error = 0;
+			for(int j=0; j<6; j++) { 
+				error += CV.SimplePerformanceScores(extractcolumn(label,j), extractcolumn(predict,j), 0.5)[2];
+			}
+			error = error/6;
+			System.out.println("the avg error in mtry = "+mtry+" is "+error);
+			long end = System.nanoTime();
+			double time = (end-start)/(double)Math.pow(10, 9);
+			time = time / (double)60;
+			System.out.println("elapsed time for mtry = "+mtry+" is: "+time+" minutes");
 		}
-		Forest f = new Forest();
-		int [] times = AlgorithmUtils.BootstrapRF(features, labels, 1, 0.5,(int)Math.floor(Math.sqrt(features.length)) , 0, 5, f);
-		double [] ans = CV.SimplePerformanceScores(label, predict, 0.5);
-		System.out.println("precision = "+ans[0]);
-		System.out.println("recall = "+ans[1]);
-		System.out.println("error = "+ans[2]);
-		System.out.println("FPR = "+ans[3]);
-		
-		precision_recall = CV.AUCcurve(label, predict, false);
-		System.out.println(precision_recall);
-		
-		for(int i=0; i<times.length; i++)
-			System.out.println("featrue numbber "+i+" appears "+times[i]+ " times");*/
+		System.out.println();
+		long end_global = System.nanoTime();
+		double time_global = (end_global-start_global)/(double)Math.pow(10, 9);
+		time_global = time_global / (double)60;
+		System.out.println("elapsed total time: "+time_global+" minutes");
 		
 	}
-	private static void paintToFile(double[] plotX, double[] plotY,String s) {
-		 int width = 400, height = 400;
-	        JFrame f = new JFrame();
-	        f.setTitle(s);
-	        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	        f.add(new GraphingData(plotX,plotY,width,height,s));
-	        f.setSize(width,height);
-	        f.setLocation(200,200);
-	        f.setVisible(true);		
+	//paint the graphs into JPG file
+	private static void paintToFile(JFrame f, double[] plotX, double[] plotY,String s) {
+    	int width = 400, height = 400;
+	    f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	    f.getContentPane().add(new GraphingData(plotX,plotY,width,height,s));
+	    f.setSize(width,height);
+	    f.setLocation(200,200);
+	    f.setVisible(true);		
+	}
+	//rank the features by times they are used
+	private static void rankFeatures(int[] count_featrues) {
+		int maxIndex;
+		for(int i=0; i<count_featrues.length; i++) {
+			maxIndex = getMax(count_featrues);
+			System.out.println("feature number " +maxIndex+" is ranked "+(i+1)+ " and used "+count_featrues[maxIndex]+" times.");
+			count_featrues[maxIndex] = Integer.MIN_VALUE;
+		}
+		
+	}
+	// get the index of the maximum number
+	private static int getMax(int[] count_featrues) {
+		int max = count_featrues[0];
+		int index = 0;
+		for(int i=1; i<count_featrues.length; i++) {
+			if(max < count_featrues[i]) {
+				max = count_featrues[i];
+				index = i;
+			}
+		}
+		return index;
 	}
 }

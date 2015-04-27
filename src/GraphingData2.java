@@ -8,37 +8,38 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
  
-public class GraphingData extends JPanel {
+public class GraphingData2 extends JPanel {
     final int PAD = 20;
     final int SPAD = 2;
     double [] x_data;
     double [] y_data;
     int width, height;
-    String title;
-    public GraphingData (double [] x, double [] y, int w, int h, String t) {
+    public GraphingData2 (double [] x, double [] y, int w, int h) {
     	x_data = x.clone();
     	y_data = y.clone();
     	width = w;
     	height = h;
-    	title = t;
     }
-    // This method overrides the original paintComponent to draw the graphs
+ 
     protected void paintComponent(Graphics g){
         super.paintComponent(g);
-        // Create a buffer to write the image to a file
         BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2 = bi.createGraphics();
+        //Graphics2D g2 = (Graphics2D)g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                             RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setBackground(Color.WHITE);
         g2.clearRect(0,0,width,height);
         int w = getWidth();
         int h = getHeight();
+        // Create a buffer to write the image to a file
+    	//BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         // Draw Y axis
-        g2.setPaint(Color.BLACK);
         g2.draw(new Line2D.Double(PAD, PAD, PAD, h-PAD));
         // Draw X  axis
         g2.draw(new Line2D.Double(PAD, h-PAD, w-PAD, h-PAD));
@@ -48,15 +49,21 @@ public class GraphingData extends JPanel {
         LineMetrics lm = font.getLineMetrics("0", frc);
         float sh = lm.getAscent() + lm.getDescent();
         // Y  axis label.
-        float sy = lm.getAscent();
-        float sw = (float)font.getStringBounds("Y", frc).getWidth();
-        float sx = PAD - sw/2;
-        g2.drawString("Y", sx, sy);
+        String s = "Y axis";
+        float sy = PAD + ((h - 2*PAD) - s.length()*sh)/2 + lm.getAscent();
+        for(int i = 0; i < s.length(); i++) {
+            String letter = String.valueOf(s.charAt(i));
+            float sw = (float)font.getStringBounds(letter, frc).getWidth();
+            float sx = (PAD - sw)/2;
+            g2.drawString(letter, sx, sy);
+            sy += sh;
+        }
         // X axis label.
-        sy = h - PAD - sh/2 + lm.getAscent();
-        sw = (float)font.getStringBounds("X", frc).getWidth();
-        sx = w - sw;
-        g2.drawString("X", sx, sy);
+        s = "X axis";
+        sy = h - PAD + (PAD - sh)/2 + lm.getAscent();
+        float sw = (float)font.getStringBounds(s, frc).getWidth();
+        float sx = (w - sw)/2;
+        g2.drawString(s, sx, sy);
         // Draw lines.
         double xInc = (double)(w - 2*PAD)/getMax(true);
         double scale = (double)(h - 2*PAD)/getMax(false);
@@ -73,6 +80,13 @@ public class GraphingData extends JPanel {
             g2.draw(new Line2D.Double(x1, y1, x2, y2));
             i_1 = i_2;
         }
+        /*for(int i = 0; i < indx.length-1; i++) {
+            double x1 = PAD + xInc*x_data[indx[i]];
+            double y1 = h - PAD - scale*y_data[indx[i]];
+            double x2 = PAD + xInc*x_data[indx[i+1]];
+            double y2 = h - PAD - scale*y_data[indx[i+1]];
+            g2.draw(new Line2D.Double(x1, y1, x2, y2));
+        }*/
         // Mark Y points in graph
         g2.setPaint(Color.black);
         for(int i = 0; i < y_data.length; i++) {
@@ -96,21 +110,30 @@ public class GraphingData extends JPanel {
             double y = h - PAD - scale*y_data[i];
             g2.fill(new Ellipse2D.Double(x-2, y-2, 4, 4));
         }
-        // Save to file
+        // Draw to file
         try {
         	g2.drawImage(bi, null, 0, 0);
-        	ImageIO.write(bi, "JPEG", new File(title + ".jpg"));
+        	ImageIO.write(bi, "JPEG", new File("test2.jpg"));
         }
         catch (IOException ie) {
      	   ie.printStackTrace();
         }
+        /*JFileChooser filechooser = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                 "JPG Images", "jpg");
+        filechooser.setFileFilter(filter);
+        int result = filechooser.showSaveDialog(null);
+        if (result == JFileChooser.APPROVE_OPTION) {
+           File saveFile = filechooser.getSelectedFile();
+           try {
+        	   g2.drawImage(bi, null, 0, 0);
+        	   ImageIO.write(bi, "JPEG", saveFile);
+           }
+           catch (IOException ie) {
+        	   ie.printStackTrace();
+           }
+        }*/
         g2.dispose();
-        //Show finished message
-        g.setFont(new Font("TimesRoman", Font.PLAIN, 24));
-        int stringLen = (int) g.getFontMetrics().getStringBounds("Finished drawing the graphs", g).getWidth();
-        int start = width/2 - stringLen/2;
-        g.drawString("Finished drawing the graphs", start, height/2);
-        g.dispose();
     }
  
     private Collection<Integer> plotByX(double[] x) {
@@ -130,5 +153,18 @@ public class GraphingData extends JPanel {
             	max = y_data[i];
         }
         return max;
+    }
+ 
+    public static void main(String[] args) {
+    	double [] x = {2,3,0,1,4,5};
+    	double [] y = {4,9,0,1,16,25};
+    	int width = 400, height = 400;
+        JFrame f = new JFrame();
+        f.setTitle("AUC curve");
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        f.add(new GraphingData2(x,y,width,height));
+        f.setSize(width,height);
+        f.setLocation(200,200);
+        f.setVisible(true);
     }
 }
