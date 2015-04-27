@@ -8,6 +8,7 @@ import java.util.Random;
 
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.integration.SimpsonIntegrator;
+import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
 import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
 import org.apache.commons.math3.analysis.interpolation.UnivariateInterpolator;
 
@@ -169,6 +170,8 @@ public class CV {
 				}
 			}
 		}
+		if(plotX_temp.size() != plotY_temp.size())
+			System.out.println("ERROR!@!@!@#");
 		double [] plotX = new double [plotX_temp.size()];
 		double [] plotY = new double [plotX_temp.size()];
 		for(int j=0; j<plotX.length; j++) {
@@ -178,9 +181,9 @@ public class CV {
 		sortAccordingToX(plotX,plotY);
 		UnivariateInterpolator interpolator = new SplineInterpolator();
 		UnivariateFunction function = interpolator.interpolate(plotX, plotY); //interpolating the plot to a function using cubic spline
-		SimpsonIntegrator integrator = new SimpsonIntegrator(1,SimpsonIntegrator.SIMPSON_MAX_ITERATIONS_COUNT);
+		SimpsonIntegrator integrator = new SimpsonIntegrator();
 		
-		double auc = integrator.integrate(integrator.SIMPSON_MAX_ITERATIONS_COUNT, function, plotX[0], plotX[plotX.length-1]);
+		double auc = integrator.integrate(Integer.MAX_VALUE, function, plotX[0], plotX[plotX.length-1]);
 		return auc;
 	}
 	// sort x coordinate, and match the y coordinate according to it

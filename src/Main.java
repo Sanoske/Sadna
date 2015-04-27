@@ -96,6 +96,7 @@ public class Main {
 			for(int j=0; j<6; j++) { 
 				precision_recall = CV.AUCcurve(extractcolumn(label,j) ,extractcolumn(predict,j), false);
 				roc = CV.AUCcurve(extractcolumn(label,j) ,extractcolumn(predict,j), true);
+				System.out.println("precision is: "+precision_recall+" and roc is: "+roc+"for label "+j);
 				plotX[count][j] = ntree;
 				plotY_roc[count][j] = roc;
 				plotY_precision[count][j] = precision_recall;
@@ -143,6 +144,7 @@ public class Main {
 		time_global = time_global / (double)60;
 		System.out.println("elapsed total time: "+time_global+" minutes");
 		
+		System.out.println("DONE");
 	}
 	//paint the graphs into JPG file
 	private static void paintToFile(JFrame f, double[] plotX, double[] plotY,String s) {
