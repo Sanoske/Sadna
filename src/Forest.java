@@ -26,7 +26,7 @@ public class Forest {
 	public int getNumberOfTrees() {
 		return this.numberOfTrees;
 	}
-	/* calculates the means of the i'th column in matrix y*/
+	/* calculates the means of the column'th column in matrix y*/
 	private static double means(int[][] y, int column) {
 		double means = 0;
 		for(int i=0;i<y.length;i++)

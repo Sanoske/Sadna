@@ -2,12 +2,15 @@ import java.lang.management.PlatformManagedObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.integration.SimpsonIntegrator;
+import org.apache.commons.math3.analysis.integration.TrapezoidIntegrator;
 import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
 import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
 import org.apache.commons.math3.analysis.interpolation.UnivariateInterpolator;
@@ -155,23 +158,29 @@ public class CV {
 		List <Double> plotX_temp = new LinkedList<Double>();
 		List <Double> plotY_temp = new LinkedList<Double>();
 		double[] sps = new double[4];
-		for(int i=0;i<thrs.length;i++) {
-			sps = SimplePerformanceScores(Y,predict,thrs[i]);
+		Set <Double> s = new HashSet<Double>();
+		for(double k : thrs)
+			s.add(k);
+		/*plotX_temp.add(0.0);
+		plotY_temp.add(0.0);
+		plotX_temp.add(1.0);
+		plotY_temp.add(1.0);*/
+		for(double i : s) {
+			sps = SimplePerformanceScores(Y,predict,i);
 			if (roc) {
-				if(!contain(sps[recall],plotX_temp)) {
-						plotX_temp.add(sps[recall]);
-						plotY_temp.add(sps[FPR]);
+				if(!contain(sps[FPR],plotX_temp)) {
+						plotX_temp.add(sps[FPR]);
+						plotY_temp.add(sps[recall]);
 					}
 			}
 			else {
-				if(!contain(sps[precision],plotX_temp)) {
-					plotX_temp.add(sps[precision]);
-					plotY_temp.add(sps[recall]);
+				if(!contain(sps[recall],plotX_temp)) {
+					plotX_temp.add(sps[recall]);
+					plotY_temp.add(sps[precision]);
 				}
 			}
 		}
-		if(plotX_temp.size() != plotY_temp.size())
-			System.out.println("ERROR!@!@!@#");
+		
 		double [] plotX = new double [plotX_temp.size()];
 		double [] plotY = new double [plotX_temp.size()];
 		for(int j=0; j<plotX.length; j++) {
@@ -179,10 +188,9 @@ public class CV {
 			plotY[j] = plotY_temp.get(j);
 		}
 		sortAccordingToX(plotX,plotY);
-		UnivariateInterpolator interpolator = new SplineInterpolator();
+		UnivariateInterpolator interpolator = new LinearInterpolator();
 		UnivariateFunction function = interpolator.interpolate(plotX, plotY); //interpolating the plot to a function using cubic spline
 		SimpsonIntegrator integrator = new SimpsonIntegrator();
-		
 		double auc = integrator.integrate(Integer.MAX_VALUE, function, plotX[0], plotX[plotX.length-1]);
 		return auc;
 	}

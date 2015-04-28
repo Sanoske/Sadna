@@ -93,9 +93,11 @@ public class Main {
 				predict[i] = cv[i].clone();
 				label[i] = labels[i].clone();
 			}
-			for(int j=0; j<6; j++) { 
-				precision_recall = CV.AUCcurve(extractcolumn(label,j) ,extractcolumn(predict,j), false);
-				roc = CV.AUCcurve(extractcolumn(label,j) ,extractcolumn(predict,j), true);
+			for(int j=0; j<6; j++) {
+				int [] labelToFunc = extractcolumn(label,j);
+				double [] predictToFunc = extractcolumn(predict,j);
+				precision_recall = CV.AUCcurve(labelToFunc ,predictToFunc, false);
+				roc = CV.AUCcurve(labelToFunc ,predictToFunc, true);
 				System.out.println("precision is: "+precision_recall+" and roc is: "+roc+"for label "+j);
 				plotX[count][j] = ntree;
 				plotY_roc[count][j] = roc;
