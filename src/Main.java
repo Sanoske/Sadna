@@ -62,27 +62,31 @@ public class Main {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		System.out.println("START");
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("please enter pathFile to the data file");
+		String s = scanner.nextLine();
+		System.out.println("plearse enter the number of labels each sample has");
+		int num_of_labels = scanner.nextInt();
 		JFrame f = new JFrame();
 		long start_global = System.nanoTime();
 		int [] ntree_array = {1,10,25,50,100};
 		int [] mtry_array = {5,10,20,40};
 		double   precision_recall ,roc;
-		double [][] plotX = new double [ntree_array.length][6]; 
-		double [][] plotY_roc = new double [ntree_array.length][6];
-		double [][] plotY_precision = new double [ntree_array.length][6];
-		double [][] plotY_error = new double [ntree_array.length][6];
-		File file = new File("emotions.csv");
+		double [][] plotX = new double [ntree_array.length][num_of_labels]; 
+		double [][] plotY_roc = new double [ntree_array.length][num_of_labels];
+		double [][] plotY_precision = new double [ntree_array.length][num_of_labels];
+		double [][] plotY_error = new double [ntree_array.length][num_of_labels];
+		File file = new File(s);
 		double [][] features_and_labels =readCSV(file);
-		double [][] features = new double [features_and_labels.length][features_and_labels[0].length-6];
-		int [][] labels = new int [features_and_labels.length][6]; 
+		double [][] features = new double [features_and_labels.length][features_and_labels[0].length-num_of_labels];
+		int [][] labels = new int [features_and_labels.length][num_of_labels]; 
 		for(int i=0;i<features_and_labels.length;i++)
-			for(int j=0;j<features_and_labels[i].length - 6;j++)
+			for(int j=0;j<features_and_labels[i].length - num_of_labels;j++)
 				features[i][j] = features_and_labels[i][j];
 		
 		for(int i=0;i<features_and_labels.length;i++)
-			for(int j=0;j<6;j++)
-				labels[i][j] = (int)features_and_labels[i][j + features_and_labels[i].length - 6];
+			for(int j=0;j<num_of_labels;j++)
+				labels[i][j] = (int)features_and_labels[i][j + features_and_labels[i].length - num_of_labels];
 		int count = 0;
 		for(int ntree : ntree_array) {
 			System.out.println(ntree+ " trees");
@@ -93,7 +97,7 @@ public class Main {
 				predict[i] = cv[i].clone();
 				label[i] = labels[i].clone();
 			}
-			for(int j=0; j<6; j++) {
+			for(int j=0; j<num_of_labels; j++) {
 				int [] labelToFunc = extractcolumn(label,j);
 				double [] predictToFunc = extractcolumn(predict,j);
 				precision_recall = CV.AUCcurve(labelToFunc ,predictToFunc, false);
@@ -106,7 +110,7 @@ public class Main {
 			}
 			count++;
 		}
-		for(int j=0; j<6; j++) {
+		for(int j=0; j<num_of_labels; j++) {
 				paintToFile(f,extractcolumn(plotX,j),extractcolumn(plotY_precision,j),"Precision-Recall curve. label "+j);
 				paintToFile(f,extractcolumn(plotX,j),extractcolumn(plotY_roc,j),"roc AUC curve. label "+j);
 				paintToFile(f,extractcolumn(plotX,j),extractcolumn(plotY_error,j),"error rate. label "+j);
@@ -130,10 +134,10 @@ public class Main {
 			}
 			System.out.println();
 			error = 0;
-			for(int j=0; j<6; j++) { 
+			for(int j=0; j<num_of_labels; j++) { 
 				error += CV.SimplePerformanceScores(extractcolumn(label,j), extractcolumn(predict,j), 0.5)[2];
 			}
-			error = error/6;
+			error = error/num_of_labels;
 			System.out.println("the avg error in mtry = "+mtry+" is "+error);
 			long end = System.nanoTime();
 			double time = (end-start)/(double)Math.pow(10, 9);
