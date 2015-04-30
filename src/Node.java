@@ -54,7 +54,7 @@ public class Node {
 			return true;
 		return false;
 	}
-	
+	// clone orig matrix
 	private int [][] creatMat(int [][] orig) {
 		int [][] rtrn = new  int[orig.length][];
 		for(int i=0;i<orig.length;i++) {

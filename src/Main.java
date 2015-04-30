@@ -1,4 +1,6 @@
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -60,7 +62,7 @@ public class Main {
 				answer1[i][j] = answer.get(i)[j];
 		return answer1;
 	}
-	
+	// the main function
 	public static void main(String[] args) throws Exception {
 		Scanner scanner = new Scanner(System.in);
 		System.out.println("please enter pathFile to the data file");
@@ -102,18 +104,12 @@ public class Main {
 				double [] predictToFunc = extractcolumn(predict,j);
 				precision_recall = CV.AUCcurve(labelToFunc ,predictToFunc, false);
 				roc = CV.AUCcurve(labelToFunc ,predictToFunc, true);
-				System.out.println("precision is: "+precision_recall+" and roc is: "+roc+"for label "+j);
 				plotX[count][j] = ntree;
 				plotY_roc[count][j] = roc;
 				plotY_precision[count][j] = precision_recall;
 				plotY_error[count][j] = CV.SimplePerformanceScores(extractcolumn(label,j), extractcolumn(predict,j), 0.5)[2];
 			}
 			count++;
-		}
-		for(int j=0; j<num_of_labels; j++) {
-				paintToFile(f,extractcolumn(plotX,j),extractcolumn(plotY_precision,j),"Precision-Recall curve. label "+j);
-				paintToFile(f,extractcolumn(plotX,j),extractcolumn(plotY_roc,j),"roc AUC curve. label "+j);
-				paintToFile(f,extractcolumn(plotX,j),extractcolumn(plotY_error,j),"error rate. label "+j);
 		}
 		System.out.println();
 		int ntree = 100;
@@ -145,11 +141,15 @@ public class Main {
 			System.out.println("elapsed time for mtry = "+mtry+" is: "+time+" minutes");
 		}
 		System.out.println();
+		for(int j=0; j<num_of_labels; j++) {
+			paintToFile(f,extractcolumn(plotX,j),extractcolumn(plotY_precision,j),"Precision-Recall curve. label "+j);
+			paintToFile(f,extractcolumn(plotX,j),extractcolumn(plotY_roc,j),"roc AUC curve. label "+j);
+			paintToFile(f,extractcolumn(plotX,j),extractcolumn(plotY_error,j),"error rate. label "+j);
+		}
 		long end_global = System.nanoTime();
 		double time_global = (end_global-start_global)/(double)Math.pow(10, 9);
 		time_global = time_global / (double)60;
 		System.out.println("elapsed total time: "+time_global+" minutes");
-		
 		System.out.println("DONE");
 	}
 	//paint the graphs into JPG file
@@ -163,13 +163,14 @@ public class Main {
 	}
 	//rank the features by times they are used
 	private static void rankFeatures(int[] count_featrues) {
+		String ranked="";
 		int maxIndex;
 		for(int i=0; i<count_featrues.length; i++) {
 			maxIndex = getMax(count_featrues);
-			System.out.println("feature number " +maxIndex+" is ranked "+(i+1)+ " and used "+count_featrues[maxIndex]+" times.");
+			ranked+="feature number " +maxIndex+" is ranked "+(i+1)+ " and used "+count_featrues[maxIndex]+" times.\r\n";
 			count_featrues[maxIndex] = Integer.MIN_VALUE;
 		}
-		
+		printStringToFile(ranked, "ranked features");
 	}
 	// get the index of the maximum number
 	private static int getMax(int[] count_featrues) {
@@ -183,4 +184,19 @@ public class Main {
 		}
 		return index;
 	}
+	// print the ranked features into file
+	public static void printStringToFile(String content, String title) {
+
+        try {
+            File newTextFile = new File(title + ".txt");
+
+            FileWriter fw = new FileWriter(newTextFile);
+            fw.write(content);
+            fw.close();
+
+        } catch (IOException iox) {
+            //do stuff with exception
+            iox.printStackTrace();
+        }
+    }
 }

@@ -44,3 +44,5 @@ local.properties
 *.JPEG
 *.jpg
 *.JPG
+
+*.txt

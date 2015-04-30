@@ -24,7 +24,7 @@ public class AlgorithmUtils {
 			ans[i] = S.get(i);
 		return ans;
 	}
-
+	// concatenate features and labels into one matrix
 	private static double[][] concatenate(double[][] x, int[][] y) {
 		int len = x[0].length+y[0].length;
 		double [][] ans = new double [x.length][len];
@@ -100,7 +100,7 @@ public class AlgorithmUtils {
 	// build RPCT 
 	private static Node RPCTNode (double [][] X , int [][] Y ,int mtry, int sigma0, int n0 ) {
 		Node np = new Node(-1, -1, null);
-		if (nrow(X) < n0 || var(Y) < sigma0) {
+		if (nrow(X) < n0 || var(Y) <= sigma0) {
 			int [][] labels = new int [Y.length][];
 			for( int k=0;k<Y.length;k++)
 				labels[k] = Y[k].clone();
@@ -161,6 +161,7 @@ public class AlgorithmUtils {
 		}
 		return best;
 	}
+	// extract the labels from ds
 	public static int[][] extractYMatrix(double[][] ds, int start, int end) {
 		int [][] ans = new int [ds.length][end-start+1];
 		for(int i=0; i<ds.length; i++)
@@ -168,7 +169,7 @@ public class AlgorithmUtils {
 				ans[i][j-start] = (int) ds[i][j];
 		return ans;
 	}
-
+	// extract the features from ds
 	public static double[][] extractXMatrix(double[][] ds, int length) {
 		double [][] ans = new double [ds.length][length];
 		for(int i=0; i<ds.length; i++)

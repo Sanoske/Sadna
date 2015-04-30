@@ -22,7 +22,7 @@ public class Forest {
 	public ClusteringTree getTree(int index) {
 		return list.get(index);
 	}
-	
+
 	public int getNumberOfTrees() {
 		return this.numberOfTrees;
 	}

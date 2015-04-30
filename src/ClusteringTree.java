@@ -13,7 +13,7 @@ public class ClusteringTree {
 	public void setRoot(Node n) {
 		this.root = n;
 	}
-	
+	// predict the labels for sample
 	public int [][] predictLabels(double [] sample) {
 		Node n = this.root;
 		while(!n.isLeaf()) {

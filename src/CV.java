@@ -150,7 +150,7 @@ public class CV {
 		ans [FPR] = FP/(FP+TN);
 		return ans;
 	}
-	
+	// compute the AUCcurve integral
 	@SuppressWarnings("static-access")
 	public static double AUCcurve(int [] Y, double [] predict, boolean roc) {
 		double [] thrs = predict.clone();
@@ -161,10 +161,7 @@ public class CV {
 		Set <Double> s = new HashSet<Double>();
 		for(double k : thrs)
 			s.add(k);
-		/*plotX_temp.add(0.0);
-		plotY_temp.add(0.0);
-		plotX_temp.add(1.0);
-		plotY_temp.add(1.0);*/
+		
 		for(double i : s) {
 			sps = SimplePerformanceScores(Y,predict,i);
 			if (roc) {
