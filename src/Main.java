@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -65,7 +66,7 @@ public class Main {
 	// the main function
 	public static void main(String[] args) throws Exception {
 		Scanner scanner = new Scanner(System.in);
-		System.out.println("please enter pathFile to the data file");
+		System.out.println("please enter pathFile to the data file (format must be as emotions.csv)");
 		String s = scanner.nextLine();
 		System.out.println("plearse enter the number of labels each sample has");
 		int num_of_labels = scanner.nextInt();
@@ -105,19 +106,20 @@ public class Main {
 				precision_recall = CV.AUCcurve(labelToFunc ,predictToFunc, false);
 				roc = CV.AUCcurve(labelToFunc ,predictToFunc, true);
 				plotX[count][j] = ntree;
-				plotY_roc[count][j] = roc;
-				plotY_precision[count][j] = precision_recall;
-				plotY_error[count][j] = CV.SimplePerformanceScores(extractcolumn(label,j), extractcolumn(predict,j), 0.5)[2];
+				plotY_roc[count][j] = Double.parseDouble(new DecimalFormat("##.###").format(roc));
+				plotY_precision[count][j] = Double.parseDouble(new DecimalFormat("##.###").format(precision_recall));
+				plotY_error[count][j] = Double.parseDouble(new DecimalFormat("##.###").
+							format(CV.SimplePerformanceScores(extractcolumn(label,j), extractcolumn(predict,j), 0.5)[2]));
 			}
 			count++;
 		}
+		String content = "";
 		System.out.println();
 		int ntree = 100;
 		double error;
 		Forest forest = new Forest();
 		int [] count_featrues;
 		count_featrues = AlgorithmUtils.BootstrapRF(features, labels, ntree, 0.5, (int)Math.floor(Math.sqrt(features.length)), 0, 5, forest);
-		rankFeatures(count_featrues);
 		System.out.println();
 		for(int mtry : mtry_array) {
 			long start = System.nanoTime();
@@ -128,23 +130,24 @@ public class Main {
 				predict[i] = cv[i].clone();
 				label[i] = labels[i].clone();
 			}
-			System.out.println();
 			error = 0;
 			for(int j=0; j<num_of_labels; j++) { 
 				error += CV.SimplePerformanceScores(extractcolumn(label,j), extractcolumn(predict,j), 0.5)[2];
 			}
 			error = error/num_of_labels;
-			System.out.println("the avg error in mtry = "+mtry+" is "+error);
+			content+="the avg error in mtry = "+mtry+" is "+error+"\r\n";
 			long end = System.nanoTime();
 			double time = (end-start)/(double)Math.pow(10, 9);
 			time = time / (double)60;
-			System.out.println("elapsed time for mtry = "+mtry+" is: "+time+" minutes");
+			content+="elapsed time for mtry = "+mtry+" is: "+time+" minutes\r\n";
+			content+="\r\n";
 		}
+		rankFeatures(count_featrues,content);
 		System.out.println();
 		for(int j=0; j<num_of_labels; j++) {
-			paintToFile(f,extractcolumn(plotX,j),extractcolumn(plotY_precision,j),"Precision-Recall curve. label "+j);
-			paintToFile(f,extractcolumn(plotX,j),extractcolumn(plotY_roc,j),"roc AUC curve. label "+j);
-			paintToFile(f,extractcolumn(plotX,j),extractcolumn(plotY_error,j),"error rate. label "+j);
+			GraphingData graph1 = new GraphingData(extractcolumn(plotX,j), extractcolumn(plotY_precision,j), 400, 400, "Precision-Recall curve. label "+j);
+			GraphingData graph2 = new GraphingData(extractcolumn(plotX,j),extractcolumn(plotY_roc,j),400,400,"roc AUC curve. label "+j);
+			GraphingData graph3 = new GraphingData(extractcolumn(plotX,j),extractcolumn(plotY_error,j),400,400,"error rate. label "+j);
 		}
 		long end_global = System.nanoTime();
 		double time_global = (end_global-start_global)/(double)Math.pow(10, 9);
@@ -152,25 +155,16 @@ public class Main {
 		System.out.println("elapsed total time: "+time_global+" minutes");
 		System.out.println("DONE");
 	}
-	//paint the graphs into JPG file
-	private static void paintToFile(JFrame f, double[] plotX, double[] plotY,String s) {
-    	int width = 400, height = 400;
-	    f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	    f.getContentPane().add(new GraphingData(plotX,plotY,width,height,s));
-	    f.setSize(width,height);
-	    f.setLocation(200,200);
-	    f.setVisible(true);		
-	}
 	//rank the features by times they are used
-	private static void rankFeatures(int[] count_featrues) {
-		String ranked="";
+	private static void rankFeatures(int[] count_featrues,String ranked) {
 		int maxIndex;
+		ranked+="\r\n";
 		for(int i=0; i<count_featrues.length; i++) {
 			maxIndex = getMax(count_featrues);
 			ranked+="feature number " +maxIndex+" is ranked "+(i+1)+ " and used "+count_featrues[maxIndex]+" times.\r\n";
 			count_featrues[maxIndex] = Integer.MIN_VALUE;
 		}
-		printStringToFile(ranked, "ranked features");
+		printStringToFile(ranked, "ranked features and avg time in different mtry");
 	}
 	// get the index of the maximum number
 	private static int getMax(int[] count_featrues) {
@@ -184,7 +178,7 @@ public class Main {
 		}
 		return index;
 	}
-	// print the ranked features into file
+	// print the string "content" into file named in the string "title"
 	public static void printStringToFile(String content, String title) {
 
         try {

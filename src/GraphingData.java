@@ -11,8 +11,8 @@ import java.util.TreeMap;
 import javax.imageio.ImageIO;
 import javax.swing.*;
  
-public class GraphingData extends JPanel {
-    final int PAD = 20;
+public class GraphingData {
+    final int PAD = 35;
     final int SPAD = 2;
     double [] x_data;
     double [] y_data;
@@ -24,10 +24,10 @@ public class GraphingData extends JPanel {
     	width = w;
     	height = h;
     	title = t;
+    	paintToFile();
     }
     // This method overrides the original paintComponent to draw the graphs
-    protected void paintComponent(Graphics g){
-        super.paintComponent(g);
+    private void paintToFile(){
         // Create a buffer to write the image to a file
         BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2 = bi.createGraphics();
@@ -35,8 +35,8 @@ public class GraphingData extends JPanel {
                             RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setBackground(Color.WHITE);
         g2.clearRect(0,0,width,height);
-        int w = getWidth();
-        int h = getHeight();
+        int w = width;
+        int h = height;
         // Draw Y axis
         g2.setPaint(Color.BLACK);
         g2.draw(new Line2D.Double(PAD, PAD, PAD, h-PAD));
@@ -48,20 +48,20 @@ public class GraphingData extends JPanel {
         LineMetrics lm = font.getLineMetrics("0", frc);
         float sh = lm.getAscent() + lm.getDescent();
         // Y  axis label.
-        float sy = lm.getAscent();
-        float sw = (float)font.getStringBounds("Y", frc).getWidth();
+        float sy = PAD/2; // + lm.getAscent();
+        float sw = (float)font.getStringBounds("Rate", frc).getWidth();
         float sx = PAD - sw/2;
-        g2.drawString("Y", sx, sy);
+        g2.drawString("Rate", sx, sy);
         // X axis label.
         sy = h - PAD - sh/2 + lm.getAscent();
-        sw = (float)font.getStringBounds("X", frc).getWidth();
+        sw = (float)font.getStringBounds("nTree", frc).getWidth();
         sx = w - sw;
-        g2.drawString("X", sx, sy);
+        g2.drawString("nTree", sx, sy);
         // Draw lines.
         double xInc = (double)(w - 2*PAD)/getMax(true);
         double scale = (double)(h - 2*PAD)/getMax(false);
         g2.setPaint(Color.green.darker());
-        Collection<Integer> indx = plotByX(x_data);
+        Collection<Integer> indx = plotBy(x_data);
         Iterator iterator = indx.iterator(); 
         int i_1 = (Integer)iterator.next();
         while (iterator.hasNext()) {
@@ -75,6 +75,7 @@ public class GraphingData extends JPanel {
         }
         // Mark Y points in graph
         g2.setPaint(Color.black);
+        g2.setFont(new Font("TimesRoman", Font.PLAIN, 12));
         for(int i = 0; i < y_data.length; i++) {
         	String dot = String.valueOf(y_data[i]);
         	float dot_w = (float)font.getStringBounds(dot, frc).getWidth();
@@ -86,7 +87,7 @@ public class GraphingData extends JPanel {
         for(int i = 0; i < x_data.length; i++) {
         	String dot = String.valueOf(x_data[i]);
         	float dot_x = (float)(PAD + xInc*x_data[i]);
-        	float dot_y = (float)(h - PAD + (PAD - sh)/2 + lm.getAscent());
+        	float dot_y = (float)(h - PAD + (PAD - sh)/2 + lm.getAscent()/2);
         	g2.drawString(dot, dot_x, dot_y);
         }
         // Mark data points.
@@ -105,22 +106,16 @@ public class GraphingData extends JPanel {
      	   ie.printStackTrace();
         }
         g2.dispose();
-        //Show finished message
-        g.setFont(new Font("TimesRoman", Font.PLAIN, 24));
-        int stringLen = (int) g.getFontMetrics().getStringBounds("Finished drawing the graphs", g).getWidth();
-        int start = width/2 - stringLen/2;
-        g.drawString("Finished drawing the graphs", start, height/2);
-        g.dispose();
     }
- 
-    private Collection<Integer> plotByX(double[] x) {
+    // sort value to indices
+    private Collection<Integer> plotBy(double[] x) {
     	Map<Double, Integer> map = new TreeMap<Double, Integer>();
         for (int i = 0; i < x.length; ++i) {
             map.put(x[i], i);
         }
         return map.values();
 	}
-
+    //get the max value in the array
 	private double getMax(boolean isX) {
         double max = -Double.MAX_VALUE;
         for(int i = 0; i < x_data.length; i++) {
