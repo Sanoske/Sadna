@@ -14,20 +14,12 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-public class readFromFile {
+public class ReadFromFile {
 	
 	public static String [][] readFromExcelFile(File file) throws Exception {
 		
-        FileInputStream fis = new FileInputStream(file);
-
-        // Finds the workbook instance for XLSX file
-        XSSFWorkbook myWorkBook = new XSSFWorkbook (fis);
-       
-        // Return first sheet from the XLSX workbook
-        XSSFSheet mySheet = myWorkBook.getSheetAt(0);
-       
         // Get iterator to all the rows in current sheet
-        Iterator<Row> rowIterator = mySheet.iterator();
+        Iterator<Row> rowIterator = Global.mySheet.iterator();
         rowIterator.next();
         List <List<String>> l = new LinkedList<List<String>>();
         // Traversing over each row of XLSX file
@@ -74,10 +66,13 @@ public class readFromFile {
 			return answer1;
 		}
 		
-		/*public static void main (String [] args) throws Exception {
-			String s = "disease_ontology_data.xlsx";
+		public static void main (String [] args) throws Exception {
+			String s = "Cosmic_slice3_3.txt";
 			File file = new File(s);
-			String [][] features_and_labels =readFromExcelFile(file);
+			String [][] cosmic =readFromFile(file);
+			Global.initVars(cosmic);
+			String [][] disease_ontology = readFromExcelFile(new File("fixed_disease_ontology_data.xlsx"));
+			double [][] X = CreateXMatrix.createTheMatrix(cosmic);
 			System.out.println("DONE");
-		}*/
+		}
 }
