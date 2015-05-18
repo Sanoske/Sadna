@@ -65,6 +65,27 @@ public class ReadFromFile {
 			}
 			return answer1;
 		}
+		// function for david
+		public static String [][] readExportPatient (File file) throws FileNotFoundException {
+			int [] arr = {2,4,5};
+			Scanner scan = new Scanner(file);
+			ArrayList<String[]> answer = new ArrayList<String[]>();
+			String currLine = scan.nextLine();
+			while(scan.hasNextLine())
+			{
+				currLine = scan.nextLine();
+				String [] a = currLine.split("\t");
+				answer.add(a);
+			}
+			scan.close();
+			int size2 = answer.size();
+			String [][] answer1 = new  String[size2][3];
+			for(int i=0;i<size2;i++) {
+				for(int j=0;j<3;j++)
+					answer1[i][j] = answer.get(i)[arr[j]];
+			}
+			return answer1;
+		}
 		
 		public static void main (String [] args) throws Exception {
 			String s = "Cosmic_slice3_3.txt";
@@ -73,6 +94,9 @@ public class ReadFromFile {
 			Global.initVars(cosmic);
 			String [][] disease_ontology = readFromExcelFile(new File("fixed_disease_ontology_data.xlsx"));
 			double [][] X = CreateXMatrix.createTheMatrix(cosmic);
+			String [] anc = CreateYMatrix.getAncestors("DOID:0050456", disease_ontology);
+			for(int i=0; i<anc.length; i++)
+				System.out.println(anc[i]);
 			System.out.println("DONE");
 		}
 }

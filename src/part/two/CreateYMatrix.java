@@ -18,14 +18,14 @@ public class CreateYMatrix {
 	private static Row findRow(String cellContent) {
 	    for (Row row : Global.mySheet) {
 	        Cell cell = row.getCell(0);
-	        if (cell.getRichStringCellValue().getString().trim().toLowerCase().equals(cellContent.toLowerCase()))
+	        if (cell.getRichStringCellValue().getString().trim().equals(cellContent))
 	        	return row;
-	        cell = row.getCell(2);
-	        if (cell.getRichStringCellValue().getString().trim().toLowerCase().contains(cellContent.toLowerCase()))
+	       /* cell = row.getCell(2,Row.CREATE_NULL_AS_BLANK);
+	        if (cell.getRichStringCellValue().getString().trim().contains(cellContent))
 	        	return row;
-	        cell = row.getCell(3);
-	        if (cell.getRichStringCellValue().getString().trim().toLowerCase().contains(cellContent.toLowerCase()))
-	        	return row;
+	        cell = row.getCell(3,Row.CREATE_NULL_AS_BLANK);
+	        if (cell.getRichStringCellValue().getString().trim().contains(cellContent))
+	        	return row;*/
 	    }
 	    return null;
 	}
@@ -33,7 +33,7 @@ public class CreateYMatrix {
 	private static void getAncestors (String doid, String [][] disease_ontology,Set <String> ancestors) throws Exception {
 		        
         Row row = findRow(doid);
-        if( !row.getCell(4).getRichStringCellValue().getString().equals("NA")) {
+        if( !(row.getCell(4).getRichStringCellValue().getString().equals("NA"))) {
         	Cell cell = row.getCell(4);
         	String [] dads = cell.getRichStringCellValue().getString().split(",");
         	for( String doidDad : dads) {
