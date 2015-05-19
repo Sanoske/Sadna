@@ -31,4 +31,16 @@ public class BTreePrinter {
         }
     	
     }
+    
+    public static int treeDepth(DiseaseNode root) {
+    	if(root.getChildren().isEmpty())
+    		return 1;
+    	int max = 0;
+    	for(DiseaseNode n : root.getChildren()) {
+    		int temp = treeDepth(n);
+    		if(temp > max)
+    			max = temp;
+    	}
+    	return max+1;
+    }
 }
