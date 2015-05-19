@@ -86,17 +86,4 @@ public class ReadFromFile {
 			}
 			return answer1;
 		}
-		
-		public static void main (String [] args) throws Exception {
-			String s = "Cosmic_slice3_3.txt";
-			File file = new File(s);
-			String [][] cosmic =readFromFile(file);
-			Global.initVars(cosmic);
-			String [][] disease_ontology = readFromExcelFile(new File("fixed_disease_ontology_data.xlsx"));
-			double [][] X = CreateXMatrix.createTheMatrix(cosmic);
-			String [] anc = CreateYMatrix.getAncestors("DOID:0050456", disease_ontology);
-			for(int i=0; i<anc.length; i++)
-				System.out.println(anc[i]);
-			System.out.println("DONE");
-		}
 }

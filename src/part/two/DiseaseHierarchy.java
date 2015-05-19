@@ -3,6 +3,7 @@ package part.two;
 import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 public class DiseaseHierarchy {
 	private HashMap<String,DiseaseNode> treeMap;
@@ -27,10 +28,7 @@ public class DiseaseHierarchy {
 			}
 			else {
 				DiseaseNode existingNode = treeMap.get(nodeID);
-				//sanity check
-				if (existingNode.isUnassigned()) {
-					System.out.println("Name is not null for item in row #: " + i);
-				}
+				
 				existingNode.setName(rawDisease[i][1]);
 				paternityTest(existingNode, rawDisease[i][4]);
 			}
@@ -39,7 +37,26 @@ public class DiseaseHierarchy {
 		if (!treeMap.containsKey("4")) {
 			System.out.println("Disease root was not recorder!?!?!?");
 		}
+		if (!(treeMap.get("4").getParents().isEmpty())) {
+			System.out.println("root has parents");
+			Set <DiseaseNode> parents = treeMap.get("4").getParents();
+			for (DiseaseNode n : parents)
+				System.out.println(n.getID()+" " + n.getName());
+		}
+		System.out.println();
+		//test();
 		return treeMap.get("4");
+	}
+
+	private void test() {
+		System.out.println("TEST");
+		DiseaseNode n = treeMap.get("14566");
+		Set <DiseaseNode> dads = n.getParents();
+		System.out.println("size of dads is: "+dads.size());
+		for(DiseaseNode k : dads)
+			System.out.println(k.getID()+" "+k.getName());
+		
+		System.out.println("END OF TEST");
 	}
 
 	private void paternityTest(DiseaseNode son, String rawParentIDs) {
@@ -52,6 +69,7 @@ public class DiseaseHierarchy {
 			else {
 				DiseaseNode newParent = new DiseaseNode(id);
 				son.setParent(newParent);
+				this.treeMap.put(id, newParent);
 			}
 		}
 	}
