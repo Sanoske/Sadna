@@ -8,8 +8,9 @@ public class MainPartTwo {
 		String s = "Cosmic_slice3_3.txt";
 		File file = new File(s);
 		String [][] cosmic =ReadFromFile.readFromFile(file);
+		Global.initVars(cosmic);
 		DiseaseHierarchy tree = new DiseaseHierarchy("fixed_disease_ontology_data.xlsx");
-		Global.initVars(cosmic,tree.getRoot());
+		Global.initTier(tree.getRoot());
 		double [][] X = CreateXMatrix.createTheMatrix(cosmic);
 		BTreePrinter.printNode(tree.getRoot(),5);
 		System.out.println("Depth is: "+BTreePrinter.treeDepth(tree.getRoot()));

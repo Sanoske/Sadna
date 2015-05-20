@@ -79,7 +79,7 @@ public class Global {
 	        return a;
 		}
 		
-		public static void initVars(String [][] cosmic,DiseaseNode root) throws Exception {
+		public static void initVars(String [][] cosmic) throws Exception {
 			
 			FileInputStream fis = new FileInputStream(new File("fixed_disease_ontology_data.xlsx"));
 			
@@ -92,7 +92,10 @@ public class Global {
 			genes = geneArray(cosmic);
 			geneToColumns = mapGeneToColumns(genes);
 			sampleToRows = mapSamplesToRows(samples);
-			labelToColumns = mapLabelToColumns(root);
 			fis.close();
+		}
+		
+		public static void initTier(DiseaseNode root) {
+			labelToColumns = mapLabelToColumns(root);
 		}
 }
