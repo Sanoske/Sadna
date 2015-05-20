@@ -18,6 +18,7 @@ public class Global {
 	public static Map <String,Integer> sampleToRows;
 	public static String [] samples;
 	public static String [] genes;
+	public static Map <String,Integer> lableToColumns;
 	
 	//the input is array string of genes names. each gene appears only once
 		private static Map<String,Integer> mapGeneToColumns(String [] genes) {

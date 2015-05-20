@@ -78,4 +78,7 @@ public class DiseaseHierarchy {
 	public DiseaseNode getRoot() {
 		return this.root;
 	}
+	public HashMap<String,DiseaseNode> getTreeMap() {
+		return this.treeMap;
+	}
 }
