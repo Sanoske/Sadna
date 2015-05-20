@@ -18,11 +18,30 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class CreateYMatrix {
-	private static final HashMap <String,String []> tier1Map = {()};
+	private static  HashMap <String,String []> tier1Map;
 	private static HashMap <String,String> memoizationMap;
 	private static final String [] commonAdditions = {"cancer","disorder","disease","syndrome"};
 	
+	private static void inittier1Map() {
+		tier1Map = new HashMap<String, String[]>();
+		String [] arr1 = {"genetic_disorder","physical_disorder"};
+		String [] arr2 = {"neoplasm"};
+		String [] arr3 = {"system_disease"};
+		String [] arr4 = {"disorder"};
+		String [] arr5 = {"syndrome"};
+		String [] arr6 = {"infectious_disease"};
+		String [] arr7 = {"metabolic_disorder","metabolic_disease"};
+		tier1Map.put("0060035", arr1);
+		tier1Map.put("14566", arr2);
+		tier1Map.put("7",arr3);
+		tier1Map.put("150",arr4);
+		tier1Map.put("225",arr5);
+		tier1Map.put("0050117",arr6);
+		tier1Map.put("0014667",arr7);
+	}
+	
 	public static int [][] createTheMatrix(String [][] extractedPatient, DiseaseNode root, HashMap<String,DiseaseNode> mapID) {
+		inittier1Map();
 		HashMap <String,String> memoizationMap = new HashMap <String,String>();
 		int [][] y = new int[Global.samples.length][];
 		for (int i = 0; i<extractedPatient.length;i++) {
@@ -35,7 +54,9 @@ public class CreateYMatrix {
 			}
 			markMatrix(y,startNode,extractedPatient[i][0]);
 		}
+		return y;
 	}
+	
 	private static void markMatrix(int[][] y, DiseaseNode startNode, String line) {
 		Queue<DiseaseNode> queue  = new LinkedList<DiseaseNode>();
 		queue.add(startNode);
