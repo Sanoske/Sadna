@@ -79,7 +79,7 @@ public class ReadFromFile {
 			}
 			scan.close();
 			int size2 = answer.size();
-			String [][] answer1 = new  String[size2][3];
+			String [][] answer1 = new  String[size2][arr.length];
 			for(int i=0;i<size2;i++) {
 				for(int j=0;j<arr.length;j++)
 					answer1[i][j] = answer.get(i)[arr[j]];
