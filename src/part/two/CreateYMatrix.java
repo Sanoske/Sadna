@@ -24,7 +24,7 @@ public class CreateYMatrix {
 	
 	public static int [][] createTheMatrix(String [][] extractedPatient, DiseaseNode root, HashMap<String,DiseaseNode> mapID) {
 		HashMap <String,String> memoizationMap = new HashMap <String,String>();
-		int [][] y = new int[extractedPatient.length][];
+		int [][] y = new int[Global.samples.length][];
 		for (int i = 0; i<extractedPatient.length;i++) {
 			DiseaseNode startNode = root;
 			for (int j = 1; j<extractedPatient[i].length;j++) {
@@ -42,7 +42,7 @@ public class CreateYMatrix {
         while(!queue.isEmpty()){
             DiseaseNode node = queue.poll();
             if (!node.getID().equals("NA")) {
-            	y[Global.sampleToRows.get((line))][Global.lableToColumns.get((node.getID()))] = 1;
+            	y[Global.sampleToRows.get((line))][Global.labelToColumns.get((node.getID()))] = 1;
             }
             queue.addAll(node.getParents());
         }    
