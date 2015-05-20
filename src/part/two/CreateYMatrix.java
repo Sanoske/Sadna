@@ -22,9 +22,9 @@ public class CreateYMatrix {
 	private static HashMap <String,String> memoizationMap;
 	private static final String [] commonAdditions = {"cancer","disorder","disease","syndrome"};
 	
-	public static String [][] createTheMatrix(String [][] extractedPatient, DiseaseNode root, HashMap<String,DiseaseNode> mapID) {
+	public static int [][] createTheMatrix(String [][] extractedPatient, DiseaseNode root, HashMap<String,DiseaseNode> mapID) {
 		HashMap <String,String> memoizationMap = new HashMap <String,String>();
-		int [][] x = new int[][];
+		int [][] y = new int[extractedPatient.length][];
 		for (int i = 0; i<extractedPatient.length;i++) {
 			DiseaseNode startNode = root;
 			for (int j = 1; j<extractedPatient[i].length;j++) {
@@ -33,16 +33,16 @@ public class CreateYMatrix {
 					startNode = bingoNode;
 				}
 			}
-			markMatrix(x,startNode,extractedPatient[i][0]);
+			markMatrix(y,startNode,extractedPatient[i][0]);
 		}
 	}
-	private static void markMatrix(int[][] x, DiseaseNode startNode, String line) {
+	private static void markMatrix(int[][] y, DiseaseNode startNode, String line) {
 		Queue<DiseaseNode> queue  = new LinkedList<DiseaseNode>();
 		queue.add(startNode);
         while(!queue.isEmpty()){
             DiseaseNode node = queue.poll();
             if (!node.getID().equals("NA")) {
-            	x[Global.sampleToRows.get(line)][Global.lableToColumns.get(node.getID())] = 1;
+            	y[Global.sampleToRows.get((line))][Global.lableToColumns.get((node.getID()))] = 1;
             }
             queue.addAll(node.getParents());
         }    
@@ -91,8 +91,8 @@ public class CreateYMatrix {
 			return node.getID();
 		}
 		//compare with suffix from tier1
-		if (tire1Map.containsKey(node.getID())) {
-			for (String addString : tire1Map.get(node.getID())) {
+		if (tier1Map.containsKey(node.getID())) {
+			for (String addString : tier1Map.get(node.getID())) {
 				String altrName = disease + "_" + addString;
 				if (compareWithLevenshtein(altrName,compareName)) {
 					return node.getID();

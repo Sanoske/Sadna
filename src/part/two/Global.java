@@ -5,7 +5,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -18,7 +20,7 @@ public class Global {
 	public static Map <String,Integer> sampleToRows;
 	public static String [] samples;
 	public static String [] genes;
-	public static Map <String,Integer> lableToColumns;
+	public static Map <String,Integer> labelToColumns;
 	
 	//the input is array string of genes names. each gene appears only once
 		private static Map<String,Integer> mapGeneToColumns(String [] genes) {
@@ -63,8 +65,21 @@ public class Global {
 			}
 			return ans;
 		}
+		private static Map<String, Integer> mapLabelToColumns(DiseaseNode root) {
+			Queue<DiseaseNode> level  = new LinkedList<DiseaseNode>();
+			Map <String,Integer> a = new HashMap<String, Integer>();
+	        level.add(root);
+	        int count = 0;
+	        while(!level.isEmpty()){
+	        	DiseaseNode d = level.poll();
+	        	a.put(d.getID(), count);
+	        	count++;
+	        	level.addAll(d.getChildren());
+	        }
+	        return a;
+		}
 		
-		public static void initVars(String [][] cosmic) throws Exception {
+		public static void initVars(String [][] cosmic,DiseaseNode root) throws Exception {
 			
 			FileInputStream fis = new FileInputStream(new File("fixed_disease_ontology_data.xlsx"));
 			
@@ -77,6 +92,7 @@ public class Global {
 			genes = geneArray(cosmic);
 			geneToColumns = mapGeneToColumns(genes);
 			sampleToRows = mapSamplesToRows(samples);
+			labelToColumns = mapLabelToColumns(root);
 			fis.close();
 		}
 }
