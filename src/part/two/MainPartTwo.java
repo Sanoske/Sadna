@@ -11,7 +11,9 @@ public class MainPartTwo {
 		Global.initVars(cosmic);
 		double [][] X = CreateXMatrix.createTheMatrix(cosmic);
 		DiseaseHierarchy tree = new DiseaseHierarchy("fixed_disease_ontology_data.xlsx");
-		BTreePrinter.printNode(tree.getRoot(),15);
+		BTreePrinter.printNode(tree.getRoot(),5);
 		System.out.println("Depth is: "+BTreePrinter.treeDepth(tree.getRoot()));
+		String [][] extractedPatient = ReadFromFile.readExportPatient(new File("extracted_export_patient_info_filtered.txt"));
+		int [][] Y = CreateYMatrix.createTheMatrix(extractedPatient,tree,tree.getTreeMap());
 	}
 }

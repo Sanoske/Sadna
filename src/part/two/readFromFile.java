@@ -67,7 +67,7 @@ public class ReadFromFile {
 		}
 		// function for david
 		public static String [][] readExportPatient (File file) throws FileNotFoundException {
-			int [] arr = {2,4,5};
+			int [] arr = {0,2,4,5};
 			Scanner scan = new Scanner(file);
 			ArrayList<String[]> answer = new ArrayList<String[]>();
 			String currLine = scan.nextLine();
@@ -81,7 +81,7 @@ public class ReadFromFile {
 			int size2 = answer.size();
 			String [][] answer1 = new  String[size2][3];
 			for(int i=0;i<size2;i++) {
-				for(int j=0;j<3;j++)
+				for(int j=0;j<arr.length;j++)
 					answer1[i][j] = answer.get(i)[arr[j]];
 			}
 			return answer1;
