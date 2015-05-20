@@ -8,12 +8,12 @@ public class MainPartTwo {
 		String s = "Cosmic_slice3_3.txt";
 		File file = new File(s);
 		String [][] cosmic =ReadFromFile.readFromFile(file);
-		Global.initVars(cosmic);
-		double [][] X = CreateXMatrix.createTheMatrix(cosmic);
 		DiseaseHierarchy tree = new DiseaseHierarchy("fixed_disease_ontology_data.xlsx");
+		Global.initVars(cosmic,tree.getRoot());
+		double [][] X = CreateXMatrix.createTheMatrix(cosmic);
 		BTreePrinter.printNode(tree.getRoot(),5);
 		System.out.println("Depth is: "+BTreePrinter.treeDepth(tree.getRoot()));
 		String [][] extractedPatient = ReadFromFile.readExportPatient(new File("extracted_export_patient_info_filtered.txt"));
-		int [][] Y = CreateYMatrix.createTheMatrix(extractedPatient,tree,tree.getTreeMap());
+		int [][] Y = CreateYMatrix.createTheMatrix(extractedPatient,tree.getRoot(),tree.getTreeMap());
 	}
 }

@@ -22,9 +22,10 @@ public class CreateYMatrix {
 	private static HashMap <String,String> memoizationMap;
 	private static final String [] commonAdditions = {"cancer","disorder","disease","syndrome"};
 	
-	public static String [][] createTheMatrix(String [][] extractedPatient, DiseaseNode root, HashMap<String,DiseaseNode> mapID) {
+	public static int [][] createTheMatrix(String [][] extractedPatient, DiseaseNode root, HashMap<String,DiseaseNode> mapID) {
 		HashMap <String,String> memoizationMap = new HashMap <String,String>();
-		int [][] y = new int[extractedPatient.length][];
+		int [][] y = new int[Global.samples.length][Global.labelToColumns.size()];
+		
 		for (int i = 0; i<extractedPatient.length;i++) {
 			DiseaseNode startNode = root;
 			for (int j = 1; j<extractedPatient[i].length;j++) {
@@ -42,7 +43,7 @@ public class CreateYMatrix {
         while(!queue.isEmpty()){
             DiseaseNode node = queue.poll();
             if (!node.getID().equals("NA")) {
-            	y[Global.sampleToRows.get((line))][Global.lableToColumns.get((node.getID()))] = 1;
+            	y[Global.sampleToRows.get((line))][Global.labelToColumns.get((node.getID()))] = 1;
             }
             queue.addAll(node.getParents());
         }    
@@ -91,8 +92,8 @@ public class CreateYMatrix {
 			return node.getID();
 		}
 		//compare with suffix from tier1
-		if (tire1Map.containsKey(node.getID())) {
-			for (String addString : tire1Map.get(node.getID())) {
+		if (tier1Map.containsKey(node.getID())) {
+			for (String addString : tier1Map.get(node.getID())) {
 				String altrName = disease + "_" + addString;
 				if (compareWithLevenshtein(altrName,compareName)) {
 					return node.getID();
