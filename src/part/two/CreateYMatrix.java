@@ -18,13 +18,13 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class CreateYMatrix {
-	private static final HashMap <String,String []> tire1Map = {()};
+	private static final HashMap <String,String []> tier1Map = {()};
 	private static HashMap <String,String> memoizationMap;
 	private static final String [] commonAdditions = {"cancer","disorder","disease","syndrome"};
 	
 	public static String [][] createTheMatrix(String [][] extractedPatient, DiseaseNode root, HashMap<String,DiseaseNode> mapID) {
 		HashMap <String,String> memoizationMap = new HashMap <String,String>();
-		int [][] x = new int[][];
+		int [][] y = new int[extractedPatient.length][];
 		for (int i = 0; i<extractedPatient.length;i++) {
 			DiseaseNode startNode = root;
 			for (int j = 1; j<extractedPatient[i].length;j++) {
@@ -33,16 +33,16 @@ public class CreateYMatrix {
 					startNode = bingoNode;
 				}
 			}
-			markMatrix(x,startNode,extractedPatient[i][0]);
+			markMatrix(y,startNode,extractedPatient[i][0]);
 		}
 	}
-	private static void markMatrix(int[][] x, DiseaseNode startNode, String line) {
+	private static void markMatrix(int[][] y, DiseaseNode startNode, String line) {
 		Queue<DiseaseNode> queue  = new LinkedList<DiseaseNode>();
 		queue.add(startNode);
         while(!queue.isEmpty()){
             DiseaseNode node = queue.poll();
             if (!node.getID().equals("NA")) {
-            	x[Global.sampleToRows(line)][Global.lableToColumns(node.getID())] = 1;
+            	y[Global.sampleToRows.get((line))][Global.lableToColumns.get((node.getID()))] = 1;
             }
             queue.addAll(node.getParents());
         }    
