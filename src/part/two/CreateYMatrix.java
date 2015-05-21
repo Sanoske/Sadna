@@ -43,7 +43,7 @@ public class CreateYMatrix {
 	
 	public static int [][] createTheMatrix(String [][] extractedPatient, DiseaseNode root, HashMap<String,DiseaseNode> mapID) {
 		inittier1Map();
-		HashMap <String,String> memoizationMap = new HashMap <String,String>();
+		memoizationMap = new HashMap<String, String>();
 		int [][] y = new int[Global.samples.length][];
 		for (int i = 0; i<extractedPatient.length;i++) {
 			DiseaseNode startNode = root;
@@ -77,7 +77,7 @@ public class CreateYMatrix {
 		Queue<DiseaseNode> queue  = new LinkedList<DiseaseNode>();
 		queue.add(searchRoot);
 		DiseaseNode resultNode = new DiseaseNode("-1");
-        while(!queue.isEmpty() || !resultNode.getID().equals("-1")){
+        while(!queue.isEmpty() && !resultNode.getID().equals("-1")){
             DiseaseNode node = queue.poll();
             matchID = compareDescription(disease,node);
             if (!matchID.equals("-1")) {
@@ -89,7 +89,7 @@ public class CreateYMatrix {
 			return resultNode;
 		}
 		else {
-			System.out.println("Search for match failed, please be kind and help us find a match for description: " + disease + "in line: " +line+ "column: " +column);
+			System.out.println("Search for match failed, please be kind and help us find a match for description: " + disease + "in line: " +line+ " column: " +column);
 			Scanner in = new Scanner(System.in);
 			String input = in.nextLine();
 			in.close();
