@@ -43,8 +43,8 @@ public class CreateYMatrix {
 	
 	public static int [][] createTheMatrix(String [][] extractedPatient, DiseaseNode root, HashMap<String,DiseaseNode> mapID) {
 		inittier1Map();
-		HashMap <String,String> memoizationMap = new HashMap <String,String>();
-		int [][] y = new int[Global.samples.length][];
+		memoizationMap = new HashMap<String, String>();
+		int [][] y = new int[Global.samples.length][Global.labelToColumns.size()];
 		for (int i = 0; i<extractedPatient.length;i++) {
 			DiseaseNode startNode = root;
 			for (int j = 1; j<extractedPatient[i].length;j++) {
@@ -67,7 +67,7 @@ public class CreateYMatrix {
         while(!queue.isEmpty()){
             DiseaseNode node = queue.poll();
             if (!node.getID().equals("NA")) {
-            	y[Global.sampleToRows.get((line))][Global.labelToColumns.get((node.getID()))] = 1;
+            	y[Global.sampleToRows.get(line)][Global.labelToColumns.get(node.getID())] = 1;
             }
             queue.addAll(node.getParents());
         }    
@@ -77,7 +77,7 @@ public class CreateYMatrix {
 		Queue<DiseaseNode> queue  = new LinkedList<DiseaseNode>();
 		queue.add(searchRoot);
 		DiseaseNode resultNode = new DiseaseNode("-1");
-        while(!queue.isEmpty() || !resultNode.getID().equals("-1")){
+        while(!queue.isEmpty() && !resultNode.getID().equals("-1")){
             DiseaseNode node = queue.poll();
             matchID = compareDescription(disease,node);
             if (!matchID.equals("-1")) {
@@ -89,16 +89,16 @@ public class CreateYMatrix {
 			return resultNode;
 		}
 		else {
-			System.out.println("Search for match failed, please be kind and help us find a match for description: " + disease + "in line: " +line+ "column: " +column);
+			System.out.println("Search for match failed, please be kind and help us find a match for description: " + disease + " in line: " +line+ " column: " +column);
 			Scanner in = new Scanner(System.in);
-			String input = in.nextLine();
-			in.close();
+			String input = in.next();
+			//in.close();
 			if (input.equals("-1")) {
 				return resultNode;
 			}
 			else {
-				memoizationMap.put(disease, input);
 				resultNode = mapID.get(input);
+				memoizationMap.put(disease, resultNode.getName());
 				return resultNode;
 			}
 		}

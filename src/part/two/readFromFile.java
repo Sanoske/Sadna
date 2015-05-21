@@ -44,8 +44,7 @@ public class ReadFromFile {
         return ans;
 	}
 	// read a  "txt" file and put it in String matrix. the words must be seperated with TAB
-		public static String[][] readFromFile(File file) throws Exception 
-		{
+		public static String[][] readFromFile(File file) throws Exception {
 			Scanner scan = new Scanner(file);
 			ArrayList<String[]> answer = new ArrayList<String[]>();
 			String currLine = scan.nextLine();
