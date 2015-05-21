@@ -89,17 +89,17 @@ public class CreateYMatrix {
 			return resultNode;
 		}
 		else {
-			System.out.println("Search for match failed, please be kind and help us find a match for description: " + disease + "in line: " +line+ " column: " +column);
+			System.out.println("Search for match failed, please be kind and help us find a match for description: " + disease + " in line: " +line+ " column: "+column);
 			Scanner in = new Scanner(System.in);
 			String input = in.nextLine();
-			in.close();
+			//in.close();
 			if (input.equals("-1")) {
 				return resultNode;
 			}
 			else {
-				memoizationMap.put(disease, input);
 				resultNode = mapID.get(input);
-				return resultNode;
+			    memoizationMap.put(disease, resultNode.getName());
+			    return resultNode;
 			}
 		}
 	}
