@@ -68,13 +68,17 @@ public class Global {
 		private static Map<String, Integer> mapLabelToColumns(DiseaseNode root) {
 			Queue<DiseaseNode> level  = new LinkedList<DiseaseNode>();
 			Map <String,Integer> a = new HashMap<String, Integer>();
+			Set <String> s = new HashSet<String>();
 	        level.add(root);
 	        int count = 0;
 	        while(!level.isEmpty()){
 	        	DiseaseNode d = level.poll();
-	        	a.put(d.getID(), count);
-	        	count++;
+	        	s.add(d.getID());
 	        	level.addAll(d.getChildren());
+	        }
+	        for(String str : s) {
+	        	a.put(str,count);
+	        	count++;
 	        }
 	        return a;
 		}

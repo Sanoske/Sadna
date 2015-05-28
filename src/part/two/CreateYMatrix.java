@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -41,33 +42,66 @@ public class CreateYMatrix {
 		  tier1Map.put("0014667",arr7);
 		 }
 	
-	public static int [][] createTheMatrix(String [][] extractedPatient, DiseaseNode root, HashMap<String,DiseaseNode> mapID) {
-		inittier1Map();
-		memoizationMap = new HashMap<String, String>();
-		int [][] y = new int[Global.samples.length][];
-		for (int i = 0; i<extractedPatient.length;i++) {
-			DiseaseNode startNode = root;
-			for (int j = 1; j<extractedPatient[i].length;j++) {
-				if (extractedPatient[i][j].equals("NS")) {
-					continue;
-				}
-				DiseaseNode bingoNode = findMatchBFS(extractedPatient[i][j],startNode,mapID,i,j);
-				if (!bingoNode.getID().equals("-1")) {
-					startNode = bingoNode;
-				}
-			}
-			markMatrix(y,startNode,extractedPatient[i][0]);
+	public static int [][] createTheMatrix(String [][] extractedPatient, DiseaseNode root) throws Exception {
+		FileInputStream fis = new FileInputStream(new File("extracted_export_ordered2.xlsx"));
+		
+		// Finds the workbook instance for XLSX file
+		XSSFSheet mySheet1;
+		XSSFWorkbook myWorkBook1 = new XSSFWorkbook (fis);
+        
+     // Return first sheet from the XLSX workbook
+        mySheet1 = myWorkBook1.getSheetAt(0);
+		int [][] y = new int[Global.samples.length][Global.labelToColumns.size()];
+		for(int i=0; i<y.length; i++)
+			for(int j=0; j<y[0].length; j++)
+				y[i][j] = 0;
+		Iterator<Row> rowIterator = mySheet1.iterator();
+		rowIterator.next();
+		while (rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+            Cell cell_id = row.getCell(0);
+            Cell cell_doid = row.getCell(6);
+            String [] doid_array = {cell_doid.getRichStringCellValue().getString()};
+            if(cell_doid.getRichStringCellValue().getString().contains(","))
+            	doid_array = cell_doid.getRichStringCellValue().getString().split(",");
+            
+            //System.out.println(cell_doid.getRichStringCellValue().getString());
+            
+            for(String doid: doid_array) {
+	            DiseaseNode n = findNode(doid, root);
+	            if(n == null) {
+	            	System.out.println("we have a null node");
+	            	System.out.println(cell_doid.getRichStringCellValue().getString());
+	            	throw new Exception();
+	            }
+	            markMatrix(y, n, Integer.toString((int)cell_id.getNumericCellValue()));
+            }
 		}
 		return y;
 	}
-	
+	private static DiseaseNode findNode (String id,DiseaseNode root) {
+		id = id.replaceAll("doid:", "");
+		id = id.replaceAll("DOID:", "");
+		Queue<DiseaseNode> queue  = new LinkedList<DiseaseNode>();
+		queue.add(root);
+        while(!queue.isEmpty()){
+            DiseaseNode node = queue.poll();
+            if (node.getID().equals(id)) {
+            	return node;
+            }
+            queue.addAll(node.getChildren());
+        }
+        return null;
+	}
 	private static void markMatrix(int[][] y, DiseaseNode startNode, String line) {
 		Queue<DiseaseNode> queue  = new LinkedList<DiseaseNode>();
 		queue.add(startNode);
         while(!queue.isEmpty()){
             DiseaseNode node = queue.poll();
-            if (!node.getID().equals("NA")) {
-            	y[Global.sampleToRows.get((line))][Global.labelToColumns.get((node.getID()))] = 1;
+            if (!(node.getID().equals("NA"))) {
+            	int i = Global.sampleToRows.get(line);
+            	int j = Global.labelToColumns.get(node.getID());
+            	y[i][j] = 1;
             }
             queue.addAll(node.getParents());
         }    
@@ -89,17 +123,17 @@ public class CreateYMatrix {
 			return resultNode;
 		}
 		else {
-			System.out.println("Search for match failed, please be kind and help us find a match for description: " + disease + " in line: " +line+ " column: "+column);
+			System.out.println("Search for match failed, please be kind and help us find a match for description: " + disease + " in line: " +line+ " column: " +column);
 			Scanner in = new Scanner(System.in);
-			String input = in.nextLine();
+			String input = in.next();
 			//in.close();
 			if (input.equals("-1")) {
 				return resultNode;
 			}
 			else {
 				resultNode = mapID.get(input);
-			    memoizationMap.put(disease, resultNode.getName());
-			    return resultNode;
+				memoizationMap.put(disease, resultNode.getName());
+				return resultNode;
 			}
 		}
 	}

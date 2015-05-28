@@ -44,8 +44,7 @@ public class ReadFromFile {
         return ans;
 	}
 	// read a  "txt" file and put it in String matrix. the words must be seperated with TAB
-		public static String[][] readFromFile(File file) throws Exception 
-		{
+		public static String[][] readFromFile(File file) throws Exception {
 			Scanner scan = new Scanner(file);
 			ArrayList<String[]> answer = new ArrayList<String[]>();
 			String currLine = scan.nextLine();
@@ -68,6 +67,27 @@ public class ReadFromFile {
 		// function for david
 		public static String [][] readExportPatient (File file) throws FileNotFoundException {
 			int [] arr = {0,2,4,5};
+			Scanner scan = new Scanner(file);
+			ArrayList<String[]> answer = new ArrayList<String[]>();
+			String currLine = scan.nextLine();
+			while(scan.hasNextLine())
+			{
+				currLine = scan.nextLine();
+				String [] a = currLine.split("\t");
+				answer.add(a);
+			}
+			scan.close();
+			int size2 = answer.size();
+			String [][] answer1 = new  String[size2][arr.length];
+			for(int i=0;i<size2;i++) {
+				for(int j=0;j<arr.length;j++)
+					answer1[i][j] = answer.get(i)[arr[j]];
+			}
+			return answer1;
+		}
+		
+		public static String [][] readExportPatientFull (File file) throws FileNotFoundException {
+			int [] arr = {0,1,2,3,4,5,6,7,8,9,10};
 			Scanner scan = new Scanner(file);
 			ArrayList<String[]> answer = new ArrayList<String[]>();
 			String currLine = scan.nextLine();

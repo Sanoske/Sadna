@@ -128,6 +128,32 @@ public class CV {
 		}
 		return predict;
 	}
+	
+	/* get cross validation prediction matrix, but you set the vector b*/ 
+	public static double [][] CVPredict(double [][] X,int [][] Y, int [] partition, int ntree, double lambda,int mtry, int sigma0,int n0) {
+		Set <Integer> a = new HashSet<Integer>();
+		for( int b: partition)
+			a.add(b);
+		int pos;
+		double [][] predict = new double [X.length][Y[0].length];
+		for(int i=0;i<a.size();i++) {
+			Forest f = new Forest(); 
+			AlgorithmUtils.BootstrapRF(getXTrain(X,partition,i), getYTrain(Y,partition,i), ntree, lambda, mtry, sigma0, n0, f);
+			pos = 0;
+			int len = getXTest(X,partition,i).length;
+			for(int j=0;j<len;j++) {
+				while(pos < partition.length) {
+					if(partition[pos] == i) {
+						predict[pos] = f.RFPredict(getXTest(X,partition,i)[j], Y[0].length).clone();
+						pos++;
+						break;
+					}
+					pos++;
+				}
+			}
+		}
+		return predict;
+	}
 	/* get the CV precision, recall , error and FPR*/
 	public static double [] SimplePerformanceScores(int [] Y , double [] predict, double threshold) {
 		int [] YGag = new int [predict.length];
