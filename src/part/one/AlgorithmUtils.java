@@ -102,10 +102,10 @@ public class AlgorithmUtils {
 	private static Node RPCTNode (double [][] X , int [][] Y ,int mtry, int sigma0, int n0 ) {
 		Node np = new Node(-1, -1, null);
 		if (nrow(X) < n0 || var(Y) <= sigma0) {
-			int [][] labels = new int [Y.length][];
-			for( int k=0;k<Y.length;k++)
-				labels[k] = Y[k].clone();
-			np.setLables(labels);
+			//int [][] labels = new int [Y.length][];
+			/*for( int k=0;k<Y.length;k++)
+				labels[k] = Y[k].clone();*/
+			np.setLables(Y);
 			return np;
 		}
 		int [] fs = pickRandomNumbers(X[0].length,mtry);

@@ -51,12 +51,46 @@ public class CreateYMatrix {
         
      // Return first sheet from the XLSX workbook
         mySheet1 = myWorkBook1.getSheetAt(0);
+		Iterator<Row> rowIterator = mySheet1.iterator();
+		rowIterator.next();
+		Iterator<Row> rowIterator1 = mySheet1.iterator();
+		rowIterator1.next();
+		Set <String> keys = new HashSet <String>();
+		Map <String,Integer> realMap = new HashMap<String, Integer>();
+		while (rowIterator1.hasNext()) {
+            Row row = rowIterator1.next();
+            Cell cell_id = row.getCell(0);
+            Cell cell_doid = row.getCell(6);
+            String [] doid_array = {cell_doid.getRichStringCellValue().getString()};
+            if(cell_doid.getRichStringCellValue().getString().contains(","))
+            	doid_array = cell_doid.getRichStringCellValue().getString().split(",");
+            
+            //System.out.println(cell_doid.getRichStringCellValue().getString());
+            
+            for(String doid: doid_array) {
+	            DiseaseNode n = findNode(doid, root);
+	            if(n == null) {
+	            	System.out.println("we have a null node");
+	            	System.out.println(cell_doid.getRichStringCellValue().getString());
+	            	throw new Exception();
+	            }
+	            putDads(n, keys);
+            }
+		}
+		int count = 0;
+		for(String key : keys) {
+			realMap.put(key, count);
+			count++;
+		}
+		System.out.println("Y matrix before change: "+Global.labelToColumns.size());
+		Global.labelToColumns = realMap;
+		System.out.println("Y matrix after change: "+Global.labelToColumns.size());
 		int [][] y = new int[Global.samples.length][Global.labelToColumns.size()];
 		for(int i=0; i<y.length; i++)
 			for(int j=0; j<y[0].length; j++)
 				y[i][j] = 0;
-		Iterator<Row> rowIterator = mySheet1.iterator();
-		rowIterator.next();
+		
+		
 		while (rowIterator.hasNext()) {
             Row row = rowIterator.next();
             Cell cell_id = row.getCell(0);
@@ -105,6 +139,16 @@ public class CreateYMatrix {
             }
             queue.addAll(node.getParents());
         }    
+	}
+	
+	private static void putDads(DiseaseNode startNode, Set <String> keys) {
+		Queue<DiseaseNode> queue  = new LinkedList<DiseaseNode>();
+		queue.add(startNode);
+        while(!queue.isEmpty()){
+            DiseaseNode node = queue.poll();
+            keys.add(node.getID());
+            queue.addAll(node.getParents());
+        }
 	}
 	private static DiseaseNode findMatchBFS (String disease, DiseaseNode searchRoot, HashMap<String,DiseaseNode> mapID, int line, int column) {
 		String matchID = "-1";

@@ -48,7 +48,8 @@ public class Node {
 		return creatMat(labels);
 	}
 	public void setLables(int [][] l) {
-		this.labels = creatMat(l);
+		//this.labels = creatMat(l);
+		this.labels = l;
 	}
 	public boolean isLeaf() {
 		if( this.leftSon == null && this.rightSon==null)
