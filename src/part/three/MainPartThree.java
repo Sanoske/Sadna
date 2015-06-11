@@ -71,11 +71,20 @@ public class MainPartThree {
 			}
 		}
 		System.out.println("partition is ready");
-		//part.one.CV.CVPredict(X, Y, partition, 1, 0.5, (int)Math.floor(Math.sqrt(extractedPatientFull.length)), 100000000, 10000000);
-		arffGenerator.makeARFF("data.arff", X, Y);
-		System.out.println("arff is done");
-		xmlGenerator.makeXMlNoRelations("relations.xml", X, Y, tree);
-		System.out.println("xml is done");
+		int [] genes_counter = new int [Global.geneToColumns.size()];
+		initArray(genes_counter);
+		double [][] cv = part.one.CV.CVPredict(X, Y, partition, 3, 0.8, (int)Math.floor(Math.sqrt(extractedPatientFull.length)), 0, 70,genes_counter);
+		System.out.println("Done CV");
+		int maxIndex = getMax(genes_counter);
+		Set<String> geneSet = Global.geneToColumns.keySet();
+		for( String g : geneSet) {
+			if(Global.geneToColumns.get(g) == maxIndex)
+				System.out.println("gene "+g+ " is most used and its used "+genes_counter[maxIndex]+" times");
+		}
+		//arffGenerator.makeARFF("data.arff", X, Y);
+		//System.out.println("arff is done");
+		//xmlGenerator.makeXMlNoRelations("relations.xml", X, Y, tree);
+		//System.out.println("xml is done");
 		
 		try {
 
@@ -105,5 +114,26 @@ public class MainPartThree {
 	private static void initArray(int[] partition) {
 		for(int i=0; i<partition.length;i++)
 			partition[i] = 0;
+	}
+	
+	//rank the features by times they are used
+	private static void rankFeatures(int[] count_featrues) {
+		int maxIndex;
+		for(int i=0; i<count_featrues.length; i++) {
+			maxIndex = getMax(count_featrues);
+			count_featrues[maxIndex] = Integer.MIN_VALUE;
+		}
+	}
+	// get the index of the maximum number
+	private static int getMax(int[] count_featrues) {
+		int max = count_featrues[0];
+		int index = 0;
+		for(int i=1; i<count_featrues.length; i++) {
+			if(max < count_featrues[i]) {
+				max = count_featrues[i];
+				index = i;
+			}
+		}
+		return index;
 	}
 }

@@ -96,6 +96,7 @@ public class AlgorithmUtils {
 		}
 	// number of rows in matrix x
 	private static int nrow(double[][] x) {
+		if(x == null) return 0;
 		return x.length;
 	}
 	// build RPCT 
@@ -110,6 +111,10 @@ public class AlgorithmUtils {
 		}
 		int [] fs = pickRandomNumbers(X[0].length,mtry);
 		BP best = bestPartition(X,Y,fs);
+		if(best.getX1()==null && best.getX2() == null) {
+			np.setLables(Y);
+			return np;
+		}
 		Node nc = RPCTNode(best.getX1(),best.getY1(),mtry,sigma0,n0);
 		np.setLeftSon(nc);
 		Node nd = RPCTNode(best.getX2(),best.getY2(),mtry,sigma0,n0);

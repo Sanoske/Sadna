@@ -94,7 +94,7 @@ public class Main {
 		int count = 0;
 		for(int ntree : ntree_array) {
 			System.out.println(ntree+ " trees");
-			double [][] cv = CV.CVPredict(features, labels, 10, ntree, 0.5,(int)Math.floor(Math.sqrt(features.length)) , 0, 5);
+			double [][] cv = CV.CVPredict(features, labels, 10, ntree, 0.5,(int)Math.floor(Math.sqrt(features.length)) , 0, 5,null); //the null will cause error
 			double [][] predict = new double [cv.length][];
 			int [][] label = new int [cv.length][];
 			for(int i=0; i<cv.length; i++) {
@@ -120,11 +120,11 @@ public class Main {
 		double error;
 		Forest forest = new Forest();
 		int [] count_featrues;
-		count_featrues = AlgorithmUtils.BootstrapRF(features, labels, ntree, 0.5, (int)Math.floor(Math.sqrt(features.length)), 0, 5, forest);
+		count_featrues = AlgorithmUtils.BootstrapRF(features, labels, ntree, 0.5, (int)Math.floor(Math.sqrt(features.length)), 0, 40, forest);
 		System.out.println();
 		for(int mtry : mtry_array) {
 			long start = System.nanoTime();
-			double [][] cv = CV.CVPredict(features, labels, 10, ntree, 0.5,mtry , 0, 5);
+			double [][] cv = CV.CVPredict(features, labels, 10, ntree, 0.5,mtry , 0, 5,null);// the null will cause error
 			double [][] predict = new double [cv.length][];
 			int [][] label = new int [cv.length][];
 			for(int i=0; i<cv.length; i++) {

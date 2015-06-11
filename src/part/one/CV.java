@@ -106,7 +106,7 @@ public class CV {
 		return ans;
 	}
 	/* get cross validation prediction matrix*/ 
-	public static double [][] CVPredict(double [][] X,int [][] Y, int folds, int ntree, double lambda,int mtry, int sigma0,int n0) {
+	public static double [][] CVPredict(double [][] X,int [][] Y, int folds, int ntree, double lambda,int mtry, int sigma0,int n0, int [] featurecounter) {
 		int [] partition = CVPartition(folds, X.length);
 		int pos;
 		double [][] predict = new double [X.length][Y[0].length];
@@ -130,15 +130,18 @@ public class CV {
 	}
 	
 	/* get cross validation prediction matrix, but you set the vector b*/ 
-	public static double [][] CVPredict(double [][] X,int [][] Y, int [] partition, int ntree, double lambda,int mtry, int sigma0,int n0) {
+	public static double [][] CVPredict(double [][] X,int [][] Y, int [] partition, int ntree, double lambda,int mtry, int sigma0,int n0, int [] features_counter) {
 		Set <Integer> a = new HashSet<Integer>();
 		for( int b: partition)
 			a.add(b);
 		int pos;
 		double [][] predict = new double [X.length][Y[0].length];
 		for(int i=0;i<a.size();i++) {
+			System.out.println("fold "+(i+1)+"/"+a.size());
 			Forest f = new Forest(); 
-			AlgorithmUtils.BootstrapRF(getXTrain(X,partition,i), getYTrain(Y,partition,i), ntree, lambda, mtry, sigma0, n0, f);
+			int [] temp_counter = AlgorithmUtils.BootstrapRF(getXTrain(X,partition,i), getYTrain(Y,partition,i), ntree, lambda, mtry, sigma0, n0, f);
+			for(int k=0; k<temp_counter.length;k++)
+				features_counter[k] += temp_counter[k];
 			pos = 0;
 			int len = getXTest(X,partition,i).length;
 			for(int j=0;j<len;j++) {
