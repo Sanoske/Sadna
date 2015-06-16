@@ -12,6 +12,7 @@ public class xmlGenerator {
 		File f=new File(filename);
 		FileOutputStream fos = new FileOutputStream(f);
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+		fos.getChannel().truncate(0);
 		bw.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
 		bw.newLine();
 		bw.write("<labels xmlns=\"http://mulan.sourceforge.net/labels\">");

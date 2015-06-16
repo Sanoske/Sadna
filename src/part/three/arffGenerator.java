@@ -11,6 +11,7 @@ public class arffGenerator {
 		File f=new File(fileName);
 		FileOutputStream fos = new FileOutputStream(f);
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+		fos.getChannel().truncate(0);
 		bw.write("@relation workshopARFF");
 		bw.newLine();
 		bw.newLine();

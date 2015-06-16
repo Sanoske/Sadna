@@ -2,6 +2,7 @@ package part.three;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -50,28 +51,46 @@ public class MainPartThree {
 		Set <String> temp = new HashSet<String>();
 		Map <String,Integer> studyToFold = new HashMap<String, Integer>();
 		for(int i=0; i< extractedPatientFull.length; i++) {
-			if(extractedPatientFull[i][10].contains("pmid"))
-				temp.add(extractedPatientFull[i][10]);
+			if(extractedPatientFull[i][10].contains("pmid")) {
+				if(temp.add(extractedPatientFull[i][10])) {}
+					//System.out.println(extractedPatientFull[i][10]);
+			}
 		}
+		System.out.println("temp size is "+temp.size());
 		int count = 0;
-		for(String str : temp) {
-			studyToFold.put(str, count);
+		for(String str1 : temp) {
+			studyToFold.put(str1, count);
 			count++;
 		}
+		/*for(int k=0; k<temp.size(); k++) {
+			for(String str2: temp) {
+				if(studyToFold.get(str2) == k)
+					System.out.println("study "+str2+" is fold number "+k);
+			}
+		}*/
 		int [] partition = new int [X.length];
+		System.out.println("partition length is "+partition.length);
 		initArray(partition);
-		Set <String> set = part.two.Global.sampleToRows.keySet();
 		for(int j=0; j<partition.length; j++) {
+			Set <String> set = part.two.Global.sampleToRows.keySet();
 			for(String str : set) {
-				if (str.equals(extractedPatientFull[j][0])) {
-					if(extractedPatientFull[j][10].contains("pmid"))
-						partition[j] = studyToFold.get(extractedPatientFull[j][10]);
+				if(Global.sampleToRows.get(str) == j) {
+					for(int k=0; k<extractedPatientFull.length; k++) {
+						if(extractedPatientFull[k][0].equals(str) && extractedPatientFull[k][10].contains("pmid")) {
+							partition[j] = studyToFold.get(extractedPatientFull[k][10]);
+							break;
+						}
+					}
 					break;
 				}
 			}
 		}
 		System.out.println("partition is ready");
-		int [] genes_counter = new int [Global.geneToColumns.size()];
+		System.out.println("max number of partition is: "+max(partition));
+		Arrays.sort(partition);
+		for(int i=0; i<partition.length; i++)
+			System.out.println(partition[i]);
+		/*int [] genes_counter = new int [Global.geneToColumns.size()];
 		initArray(genes_counter);
 		double [][] cv = part.one.CV.CVPredict(X, Y, partition, 3, 0.8, (int)Math.floor(Math.sqrt(extractedPatientFull.length)), 0, 70,genes_counter);
 		System.out.println("Done CV");
@@ -80,11 +99,11 @@ public class MainPartThree {
 		for( String g : geneSet) {
 			if(Global.geneToColumns.get(g) == maxIndex)
 				System.out.println("gene "+g+ " is most used and its used "+genes_counter[maxIndex]+" times");
-		}
-		//arffGenerator.makeARFF("data.arff", X, Y);
-		//System.out.println("arff is done");
-		//xmlGenerator.makeXMlNoRelations("relations.xml", X, Y, tree);
-		//System.out.println("xml is done");
+		}*/
+		arffGenerator.makeARFF("data.arff", X, Y);
+		System.out.println("arff is done");
+		xmlGenerator.makeXMlNoRelations("relations.xml", X, Y, tree);
+		System.out.println("xml is done");
 		
 		try {
 
@@ -93,15 +112,13 @@ public class MainPartThree {
 
             RAkEL learner1 = new RAkEL(new LabelPowerset(new J48()));
             MLkNN learner2 = new MLkNN();
-
+            
             Evaluator eval = new Evaluator();
             MultipleEvaluation results;
-
-            int numFolds = 10;
-            //results = eval.crossValidate(learner1, dataset, numFolds);
-           // System.out.println(results);
-            results = eval.crossValidate(learner2, dataset, numFolds);
-            System.out.println(results);
+            
+            CV_kNN cvknn = new CV_kNN(learner2);
+            cvknn.runCV(X, Y, partition);
+            
         } catch (InvalidDataFormatException ex) {
             Logger.getLogger(CrossValidationExperiment.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception ex) {
@@ -135,5 +152,13 @@ public class MainPartThree {
 			}
 		}
 		return index;
+	}
+	
+	private static int max(int[] arr) {
+		int m=arr[0];
+		for(int i=0; i<arr.length;i++){
+			m=Math.max(m, arr[i]);
+		}
+		return m;
 	}
 }
