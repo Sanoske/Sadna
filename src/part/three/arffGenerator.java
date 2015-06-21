@@ -17,13 +17,21 @@ public class arffGenerator {
 		bw.newLine();
 		Set <String> labels = Global.labelToColumns.keySet();
 		Set <String> doids = Global.geneToColumns.keySet();
-		for(String doid : doids){
-			bw.write("@attribute "+doid+" numeric");
-			bw.newLine();
+		for(int i=0; i<doids.size(); i++) {
+			for(String doid : doids){
+				if(Global.geneToColumns.get(doid) == i) {
+					bw.write("@attribute "+doid+" numeric");
+					bw.newLine();
+				}
+			}
 		}
-		for(String str : labels){
-			bw.write("@attribute DOID"+str+" {0,1}");
-			bw.newLine();
+		for(int j=0; j<labels.size(); j++) {
+			for(String str : labels){
+				if(Global.labelToColumns.get(str) == j) {
+					bw.write("@attribute DOID"+str+" {0,1}");
+					bw.newLine();
+				}
+			}
 		}
 		bw.write("@data");
 		bw.newLine();

@@ -54,21 +54,85 @@ public class CreateXMatrix {
 				}
 			}
 		}
-		double [][] realX = new double [samples.length][realGeneToColumns.size()];
+		Map<String,Integer> realrealGeneToColumns = new HashMap<String, Integer>();
+		realPosition = 0;
+		int [] countgenes = new int [realGeneToColumns.size()];
+		
 		Set <String> keys = realGeneToColumns.keySet();
-		for( int j=0; j<realX.length; j++) {
-			for(String key: keys) {
-				realX[j][realGeneToColumns.get(key)] = X[j][Global.geneToColumns.get(key)];
+		for( String gene: keys) {
+			int pos = realGeneToColumns.get(gene);
+			for(int i=0; i<X.length; i++) {
+				if(X[i][pos] == 1)
+					countgenes[pos]++;
 			}
 		}
-		if(Global.geneToColumns.size() == realGeneToColumns.size()) {
+		
+		for(String gene: keys) {
+			int pos = realGeneToColumns.get(gene);
+			if(countgenes[pos] > 0) {
+				realrealGeneToColumns.put(gene, realPosition);
+				realPosition++;
+			}
+		}
+		double [][] realX1 = new double [samples.length][realrealGeneToColumns.size()];
+		keys = realrealGeneToColumns.keySet();
+		for( int j=0; j<realX1.length; j++) {
+			for(String key: keys) {
+				realX1[j][realrealGeneToColumns.get(key)] = X[j][realGeneToColumns.get(key)];
+			}
+		}
+		if(Global.geneToColumns.size() == realrealGeneToColumns.size()) {
 			System.out.println("NOT GOOD");
 			throw new Exception();
 		}
-		System.out.println("X matrix before change: "+Global.geneToColumns.size());
-		Global.geneToColumns = realGeneToColumns;
-		System.out.println("X matrix after change: "+Global.geneToColumns.size());
-		return realX;
+		
+		/*Map<String,Integer> realsamplesToRows = new HashMap<String, Integer>();
+		keys = Global.sampleToRows.keySet();
+		boolean hasOnes = false;
+		realPosition = 0;
+		for(int i=0; i<realX1.length; i++) {
+			for(int j=0; j<realX1[0].length; j++) {
+				if(realX1[i][j] == 1)
+					hasOnes = true;
+			}
+			if(hasOnes) {
+				for(String row : keys) {
+					if(Global.sampleToRows.get(row) == i) {
+						realsamplesToRows.put(row, realPosition);
+						realPosition++;
+						break;
+					}
+				}
+			}
+			hasOnes = false;
+		}
+		
+		double [][] realX = new double [realsamplesToRows.size()][realrealGeneToColumns.size()];
+		Set <String > rows = realsamplesToRows.keySet();
+		Set <String> columns = realrealGeneToColumns.keySet();
+		for(String row: rows) {
+			for(String column: columns) {
+				realX[realsamplesToRows.get(row)][realrealGeneToColumns.get(column)] = realX1[Global.sampleToRows.get(row)][realrealGeneToColumns.get(column)];
+			}
+		}
+		
+		System.out.println("X matrix before change rows: "+Global.geneToColumns.size());
+		Global.sampleToRows = realsamplesToRows;
+		System.out.println("X matrix after change rows: "+Global.geneToColumns.size());
+		
+		keys = Global.sampleToRows.keySet();
+		String [] newSamples = new String [Global.sampleToRows.size()];
+		int count = 0;
+		for(String sam: keys) {
+			newSamples[count] = sam;
+			count++;
+		}
+		Global.samples = newSamples;*/
+		
+		System.out.println("X matrix before change columns: "+Global.geneToColumns.size());
+		Global.geneToColumns = realrealGeneToColumns;
+		System.out.println("X matrix after change columns: "+Global.geneToColumns.size());
+		return realX1;
 	}
 
 	private static void initMatrix(double[][] x) {

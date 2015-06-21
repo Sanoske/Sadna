@@ -42,6 +42,7 @@ public class MainPartTwo {
 	public static void printMatrixToFile(double [][] x, File file1, Map<String, Integer> map, String headline) throws Exception {
 		FileOutputStream fos = new FileOutputStream(file1);
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+		fos.getChannel().truncate(0);
 		bw.write(headline);
 		bw.newLine();
 		bw.newLine();
@@ -49,9 +50,9 @@ public class MainPartTwo {
 		bw.newLine();
 		String s="";
 		for(int i=0; i<x.length; i++) {
-			s=Global.samples[i]+"  ";
+			s=Global.samples[i]+"\t";
 			for(int j=0; j<x[i].length; j++)
-				s+= x[Global.sampleToRows.get(Global.samples[i])][j] + "  ";
+				s+= (int)x[Global.sampleToRows.get(Global.samples[i])][j] + "\t";
 			bw.write(s);
 			bw.newLine();
 			s="";

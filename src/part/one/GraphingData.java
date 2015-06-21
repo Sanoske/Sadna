@@ -50,12 +50,12 @@ public class GraphingData {
         float sh = lm.getAscent() + lm.getDescent();
         // Y  axis label.
         float sy = PAD/2; // + lm.getAscent();
-        float sw = (float)font.getStringBounds("Rate", frc).getWidth();
+        float sw = (float)font.getStringBounds(" ", frc).getWidth();
         float sx = PAD - sw/2;
         g2.drawString("Rate", sx, sy);
         // X axis label.
         sy = h - PAD - sh/2 + lm.getAscent();
-        sw = (float)font.getStringBounds("nTree", frc).getWidth();
+        sw = (float)font.getStringBounds(" ", frc).getWidth();
         sx = w - sw;
         g2.drawString("nTree", sx, sy);
         // Draw lines.
@@ -74,7 +74,7 @@ public class GraphingData {
             g2.draw(new Line2D.Double(x1, y1, x2, y2));
             i_1 = i_2;
         }
-        // Mark Y points in graph
+       /* // Mark Y points in graph
         g2.setPaint(Color.black);
         g2.setFont(new Font("TimesRoman", Font.PLAIN, 12));
         for(int i = 0; i < y_data.length; i++) {
@@ -97,7 +97,7 @@ public class GraphingData {
             double x = PAD + xInc*x_data[i];
             double y = h - PAD - scale*y_data[i];
             g2.fill(new Ellipse2D.Double(x-2, y-2, 4, 4));
-        }
+        }*/
         // Save to file
         try {
         	g2.drawImage(bi, null, 0, 0);

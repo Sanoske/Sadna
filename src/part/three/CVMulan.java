@@ -1,11 +1,18 @@
 package part.three;
 
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.HashSet;
 import java.util.Set;
 
+import part.two.Global;
 import mulan.classifier.MultiLabelOutput;
 import mulan.data.MultiLabelInstances;
+import mulan.evaluation.measure.MacroAUC;
 import weka.core.Instance;
 import weka.core.Instances;
 
@@ -16,37 +23,46 @@ public abstract class CVMulan {
 	public abstract MultiLabelOutput predict(Instance Ins) throws Exception;
 	public Instances toTrain;
 	public Instances toTest;
-	private Instances emptyDataSet;				// TODO
-	private int [][] Y;
+	private Instances emptyDataSet;
+	private double [][] Y;
 	
 	// implemented
-	public void runCV(double[][] x, int[][] y, int[] partition) throws Exception{
+	public double [][] runCV(double[][] x, int[][] y, int[] partition,int Algorithm) throws Exception{
 		int numOfFolds = 1+max(partition);
 		int f;
 		
-		Set<Integer> testPos;
 		Instances allData = (new MultiLabelInstances("data.arff", "relations.xml")).getDataSet();
 		emptyDataSet = new Instances(allData);
 		emptyDataSet.delete();
-		Y = new int[x.length][x[0].length];
-		
+		toTest = new Instances(allData);
+		Y = new double[x.length][x[0].length];
 		
 		// All partitions folds
 
 		for(f=0; f<numOfFolds;f++){
-			System.out.println("fold "+f+"/"+numOfFolds);
-			testPos=leaveStudyOutPartition(allData, f, partition);
+			System.out.println("fold "+(f+1)+"/"+(numOfFolds));
+			Set<Integer> testPos=leaveStudyOutPartition(allData, f, partition);
 			train(new MultiLabelInstances(toTrain,"relations.xml"));			
-			for(int j : testPos){
-				MultiLabelOutput output =predict(toTrain.get(j));		// TODO
-				boolean [] predicted_labels_bools = output.getBipartition();
-				int [] predicted_labels = new int[predicted_labels_bools.length];
-				for(int k=0; k<predicted_labels.length; k++)
-					predicted_labels[k] = ((predicted_labels_bools[k]) == true ? 1 : 0);
-				Y[j] = predicted_labels;
+			for(int j: testPos){
+				MultiLabelOutput output =predict(toTest.get(j));
+				if(!output.hasConfidences())
+					System.out.println("no confidence");
+				Y[j] = output.getConfidences();
 			}
 		}
+		return Y;
+	}
 		
+	
+	private double[] score_arr(double[] predicted_labels, double[] confidences) {
+		double [] arr = new double [predicted_labels.length];
+		for(int i=0;i<predicted_labels.length;i++){
+			if( predicted_labels[i] == 1)
+				arr[i] = confidences[i];
+			else
+				arr[i] = confidences[i];
+		}
+		return arr;
 	}
 	private Set<Integer> leaveStudyOutPartition(Instances allData, int study, int[] study_list){
 		
@@ -55,12 +71,10 @@ public abstract class CVMulan {
 		Set<Integer> testPos=new HashSet<Integer>(); 
 		int dataSize=allData.numInstances();
 		toTrain=new Instances(emptyDataSet);
-		toTest=new Instances(emptyDataSet);
 		
 		for(int i=0; i<dataSize;i++){
 			currIns=allData.get(i);
 			if(study_list[i]==study){
-				toTest.add(currIns);
 				testPos.add(i);
 			}else{
 				toTrain.add(currIns);

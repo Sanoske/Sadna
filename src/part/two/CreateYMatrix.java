@@ -3,6 +3,7 @@ package part.two;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -12,6 +13,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -82,10 +84,8 @@ public class CreateYMatrix {
 			realMap.put(key, count);
 			count++;
 		}
-		System.out.println("Y matrix before change: "+Global.labelToColumns.size());
 		Global.labelToColumns = realMap;
-		System.out.println("Y matrix after change: "+Global.labelToColumns.size());
-		int [][] y = new int[Global.samples.length][Global.labelToColumns.size()];
+		int [][] y = new int[Global.sampleToRows.size()][realMap.size()];
 		for(int i=0; i<y.length; i++)
 			for(int j=0; j<y[0].length; j++)
 				y[i][j] = 0;
@@ -111,7 +111,41 @@ public class CreateYMatrix {
 	            markMatrix(y, n, Integer.toString((int)cell_id.getNumericCellValue()));
             }
 		}
-		return y;
+		
+		Map <String,Integer> realrealMap = new HashMap<String, Integer>();
+		int [] countdoids = new int [realMap.size()];
+		keys = realMap.keySet();
+		int realPosition = 0;
+		for( String doid: keys) {
+			int pos = realMap.get(doid);
+			for(int i=0; i<y.length; i++) {
+				if(y[i][pos] == 1)
+					countdoids[pos]++;
+			}
+		}
+		for(String doid: keys) {
+			int pos = realMap.get(doid);
+			if(countdoids[pos] > 7 && countdoids[pos] < y.length-10) {
+				realrealMap.put(doid, realPosition);
+				realPosition++;
+			}
+		}
+		int [][] realy = new int [y.length][realrealMap.size()];
+		keys = realrealMap.keySet();
+		for( int j=0; j<realy.length; j++) {
+			for(String key: keys) {
+				realy[j][realrealMap.get(key)] = y[j][realMap.get(key)];
+			}
+		}
+		keys = realrealMap.keySet();
+		
+		for(String key: keys) {
+			Global.ColumnsToLabel.put(realrealMap.get(key), key);
+		}
+		System.out.println("Y matrix before change: "+Global.labelToColumns.size());
+		Global.labelToColumns = realrealMap;
+		System.out.println("Y matrix after change: "+Global.labelToColumns.size());
+		return realy;
 	}
 	private static DiseaseNode findNode (String id,DiseaseNode root) {
 		id = id.replaceAll("doid:", "");

@@ -1,6 +1,7 @@
 package part.three;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -41,13 +42,18 @@ public class xmlGenerator {
 		File f=new File(filename);
 		FileOutputStream fos = new FileOutputStream(f);
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
-		bw.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+		bw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 		bw.newLine();
 		bw.write("<labels xmlns=\"http://mulan.sourceforge.net/labels\">");
 		bw.newLine();
-		for( String n : labels) {
-			bw.write("<label name=\"DOID"+n+"\">" + "</label>");
-			bw.newLine();
+		
+		for(int i=0; i<labels.size(); i++) {
+			for( String n : labels) {
+				if(Global.labelToColumns.get(n) == i) {
+					bw.write("<label name=\"DOID"+n+"\">" + "</label>");
+					bw.newLine();
+				}
+			}
 		}
 		bw.write("</labels>");
 		bw.close();

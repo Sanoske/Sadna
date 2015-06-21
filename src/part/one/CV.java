@@ -137,7 +137,7 @@ public class CV {
 		int pos;
 		double [][] predict = new double [X.length][Y[0].length];
 		for(int i=0;i<a.size();i++) {
-			System.out.println("fold "+(i+1)+"/"+a.size());
+			System.out.println("fold "+(i+1)+"/"+(a.size()));
 			Forest f = new Forest(); 
 			int [] temp_counter = AlgorithmUtils.BootstrapRF(getXTrain(X,partition,i), getYTrain(Y,partition,i), ntree, lambda, mtry, sigma0, n0, f);
 			for(int k=0; k<temp_counter.length;k++)
@@ -180,9 +180,8 @@ public class CV {
 		ans [FPR] = FP/(FP+TN);
 		return ans;
 	}
-	// compute the AUCcurve integral
-	@SuppressWarnings("static-access")
-	public static double AUCcurve(int [] Y, double [] predict, boolean roc) {
+	
+	public static double [][] makeArraysForGraphsAndAUC(int [] Y, double [] predict,boolean roc) {
 		double [] thrs = predict.clone();
 		Arrays.sort(thrs);
 		List <Double> plotX_temp = new LinkedList<Double>();
@@ -215,6 +214,17 @@ public class CV {
 			plotY[j] = plotY_temp.get(j);
 		}
 		sortAccordingToX(plotX,plotY);
+		double [][] ans = new double[2][];
+		ans[0] = plotX.clone();
+		ans[1] = plotY.clone();
+		return ans;
+	}
+	// compute the AUCcurve integral
+	@SuppressWarnings("static-access")
+	public static double AUCcurve(int [] Y, double [] predict, boolean roc) {
+		double [][] XandY = makeArraysForGraphsAndAUC(Y, predict, roc);
+		double [] plotX = XandY[0];
+		double [] plotY = XandY[1];
 		UnivariateInterpolator interpolator = new LinearInterpolator();
 		UnivariateFunction function = interpolator.interpolate(plotX, plotY); //interpolating the plot to a function using cubic spline
 		SimpsonIntegrator integrator = new SimpsonIntegrator();
